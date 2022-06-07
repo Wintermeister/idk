@@ -4518,7 +4518,6 @@ CMDs[#CMDs + 1] = {NAME = 'cskill [plr]', DESC = 'Kills any player in Critical S
 CMDs[#CMDs + 1] = {NAME = 'csloopkill [plr]', DESC = 'Loopkills any player in Critical Strike'}
 CMDs[#CMDs + 1] = {NAME = 'csunloopkill [plr]', DESC = 'Disables the loopkill cmd on any player'}
 CMDs[#CMDs + 1] = {NAME = 'cskick [plr]', DESC = 'Kicks (ALMOST) any player in Critical Strike'}
-CMDs[#CMDs + 1] = {NAME = 'skick [plr]', DESC = 'Kicks any player in Critical Strike'}
 CMDs[#CMDs + 1] = {NAME = 'rainbow', DESC = 'Applies Rainbow Effect to WeaponColor'}
 CMDs[#CMDs + 1] = {NAME = 'unrainbow', DESC = 'Removes Rainbow Effect from WeaponColor'}
 CMDs[#CMDs + 1] = {NAME = 'loadmap [map name]', DESC = 'Replaces a map if found (CS5)'}
@@ -11681,13 +11680,6 @@ addcmd('csunrainbow',{'unrainbow'},function(args, speaker)
     end
 end)
 
-addcmd('skick',{},function(args, speaker)
-    local players = getPlayer(args[1], speaker)
-    for i,v in pairs(players) do
-        effectapply(game.Workspace.SuperDummy, game.Players.LocalPlayer.RemotesFired, Players[v].RemotesFired)
-    end
-end)
-
 addcmd('csunloopkill',{'unloopkill'},function(args, speaker)
     local players = getPlayer(args[1], speaker)
 
@@ -11789,6 +11781,23 @@ addcmd('dellaunch', {'deletelaunchers'}, function(args, speaker)
 				effectapply(workspace.SuperDummy, game.ReplicatedStorage.Effects.StealthWarning.Effect, c)
 			end
 		end
+	end
+end)
+
+addcmd('maps', {}, function(args, speaker)
+	local p = game.ReplicatedStorage:FindFirstChild'Part'
+	local str = ""
+
+	if p then
+		for i, c in pairs(p:GetChildren()) do
+			str = str.. c.Name
+
+			if i ~= table.getn(p:GetChildren()) then
+				str = str.. ", "
+			end
+		end
+
+		notify("Available Maps", str)
 	end
 end)
 
