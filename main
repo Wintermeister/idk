@@ -4520,8 +4520,8 @@ CMDs[#CMDs + 1] = {NAME = 'csunloopkill [plr]', DESC = 'Disables the loopkill cm
 CMDs[#CMDs + 1] = {NAME = 'cskick [plr]', DESC = 'Kicks (ALMOST) any player in Critical Strike'}
 CMDs[#CMDs + 1] = {NAME = 'rainbow', DESC = 'Applies Rainbow Effect to WeaponColor'}
 CMDs[#CMDs + 1] = {NAME = 'unrainbow', DESC = 'Removes Rainbow Effect from WeaponColor'}
-CMDs[#CMDs + 1] = {NAME = 'loadmap [map name]', DESC = 'Replaces a map if found (CS5)'}
-CMDs[#CMDs + 1] = {NAME = 'replacemap [map name]', DESC = 'Replaces a map if found (CS5)'}
+CMDs[#CMDs + 1] = {NAME = 'loadmap [map name / random]', DESC = 'Replaces a map if found (CS5)'}
+CMDs[#CMDs + 1] = {NAME = 'replacemap [map name / random]', DESC = 'Replaces a map if found (CS5)'}
 CMDs[#CMDs + 1] = {NAME = 'ifs', DESC = 'Makes final strike happen instantly (CS5)'}
 CMDs[#CMDs + 1] = {NAME = 'delheal', DESC = 'Deletes all heal cubes (CS5)'}
 CMDs[#CMDs + 1] = {NAME = 'dellaunch', DESC = 'Deletes all launchers (CS5)'}
@@ -11728,13 +11728,21 @@ addcmd('loadmap',{'replacemap'}, function(args, speaker)
 		end
 	end
 
-	local tab = {}
+	if string.lower(str) ~= "random" then
+		for i, c in pairs(p:GetChildren()) do
+			local ssp = string.split(string.lower(c.Name), string.lower(str))
 
-	for i, c in pairs(p:GetChildren()) do
-		local ssp = string.split(string.lower(c.Name), string.lower(str))
+			if ssp[1] and ssp[2] then
+				str = c.Name
+			end
+		end
+	elseif table.getn(p:GetChildren()) >= 1 then
+		local mr = math.random(1, table.getn(p:GetChildren()))
 
-		if ssp[1] and ssp[2] then
-			str = c.Name
+		for i, c in pairs(p:GetChildren()) do
+			if i == mr then
+				str = c.Name
+			end
 		end
 	end
 
