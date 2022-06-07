@@ -11774,7 +11774,7 @@ addcmd('delheal', {'deleteheal'}, function(args, speaker)
 	end
 end)
 
-addcmd('dellauncher', {'deletelauncher'}, function(args, speaker)
+addcmd('dellaunch', {'deletelaunchers'}, function(args, speaker)
 	local map
 
 	for i, c in pairs(workspace:GetChildren()) do
