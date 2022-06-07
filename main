@@ -11728,6 +11728,16 @@ addcmd('loadmap',{'replacemap'}, function(args, speaker)
 		end
 	end
 
+	local tab = {}
+
+	for i, c in pairs(p:GetChildren()) do
+		local ssp = string.split(string.lower(c.Name), string.lower(str))
+
+		if ssp[1] and ssp[2] then
+			str = c.Name
+		end
+	end
+
 	if p and map and p:FindFirstChild(str) then
 		effectapply(workspace.SuperDummy, game.ReplicatedStorage.Effects.StealthWarning.Effect, map.Map)
 		effectapply(workspace.SuperDummy, p[str].Map, map)
@@ -11787,13 +11797,22 @@ end)
 addcmd('maps', {}, function(args, speaker)
 	local p = game.ReplicatedStorage:FindFirstChild'Part'
 	local str = ""
+	local tab = {}
 
 	if p then
 		for i, c in pairs(p:GetChildren()) do
-			str = str.. c.Name
+			if not tab[c.Name] then
+				tab[c.Name] = true
 
-			if i ~= table.getn(p:GetChildren()) then
-				str = str.. ", "
+				str = str.. c.Name.. ", "
+			end
+		end
+
+		local str2 = ""
+
+		for i, c in pairs(string.split(str, "")) do
+			if i <= table.getn(string.split(str, "")) - 2 then
+				str2 = str2.. c
 			end
 		end
 
