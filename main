@@ -4525,6 +4525,9 @@ CMDs[#CMDs + 1] = {NAME = 'replacemap [map name / random]', DESC = 'Replaces a m
 CMDs[#CMDs + 1] = {NAME = 'ifs', DESC = 'Makes final strike happen instantly (CS5)'}
 CMDs[#CMDs + 1] = {NAME = 'delheal', DESC = 'Deletes all heal cubes (CS5)'}
 CMDs[#CMDs + 1] = {NAME = 'dellaunch', DESC = 'Deletes all launchers (CS5)'}
+CMDs[#CMDs + 1] = {NAME = 'rclass', DESC = 'Picks a random class (CS5)'}
+CMDs[#CMDs + 1] = {NAME = 'randomclass', DESC = 'Picks a random class (CS5)'}
+CMDs[#CMDs + 1] = {NAME = 'classrandom', DESC = 'Picks a random class (CS5)'}
 CMDs[#CMDs + 1] = {NAME = '', DESC = ''}
 CMDs[#CMDs + 1] = {NAME = 'discord / support / help', DESC = 'Invite to the Infinite Yield support server.'}
 CMDs[#CMDs + 1] = {NAME = 'console', DESC = 'Loads old Roblox console'}
@@ -11825,6 +11828,14 @@ addcmd('maps', {}, function(args, speaker)
 		end
 
 		notify("Available Maps", str)
+	end
+end)
+
+addcmd('rclass', {'randomclass', 'classrandom'}, function(args, speaker)
+	local obj = workspace.ClassStands:GetChildren()[math.random(1, table.getn(workspace.ClassStands:GetChildren()))]
+
+	if obj:FindFirstChild'MainSkin' then
+		game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = obj.MainSkin.CFrame
 	end
 end)
 
