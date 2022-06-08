@@ -11767,7 +11767,7 @@ addcmd('ifs',{'instantfinal', 'instantfinalstrike'}, function(args, speaker)
 
 	if map then
 		for i, c in pairs(map:GetChildren()) do
-			if c:IsA'Model' then
+			if c:IsA'Model' and c:FindFirstChild'Outer' then
 				effectapply(workspace.SuperDummy, game.ReplicatedStorage.Effects.StealthWarning.Effect, c.Outer)
 			end
 		end
