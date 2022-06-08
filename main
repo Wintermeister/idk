@@ -4520,14 +4520,11 @@ CMDs[#CMDs + 1] = {NAME = 'csunloopkill [plr]', DESC = 'Disables the loopkill cm
 CMDs[#CMDs + 1] = {NAME = 'cskick [plr]', DESC = 'Kicks (ALMOST) any player in Critical Strike'}
 CMDs[#CMDs + 1] = {NAME = 'rainbow', DESC = 'Applies Rainbow Effect to WeaponColor'}
 CMDs[#CMDs + 1] = {NAME = 'unrainbow', DESC = 'Removes Rainbow Effect from WeaponColor'}
-CMDs[#CMDs + 1] = {NAME = 'loadmap [map name / random]', DESC = 'Replaces a map if found (CS5)'}
-CMDs[#CMDs + 1] = {NAME = 'replacemap [map name / random]', DESC = 'Replaces a map if found (CS5)'}
+CMDs[#CMDs + 1] = {NAME = 'loadmap / replacemap [map name / random / all (kys)]', DESC = 'Replaces a map if found (CS5)'}
 CMDs[#CMDs + 1] = {NAME = 'ifs', DESC = 'Makes final strike happen instantly (CS5)'}
 CMDs[#CMDs + 1] = {NAME = 'delheal', DESC = 'Deletes all heal cubes (CS5)'}
 CMDs[#CMDs + 1] = {NAME = 'dellaunch', DESC = 'Deletes all launchers (CS5)'}
-CMDs[#CMDs + 1] = {NAME = 'rclass', DESC = 'Picks a random class (CS5)'}
-CMDs[#CMDs + 1] = {NAME = 'randomclass', DESC = 'Picks a random class (CS5)'}
-CMDs[#CMDs + 1] = {NAME = 'classrandom', DESC = 'Picks a random class (CS5)'}
+CMDs[#CMDs + 1] = {NAME = 'rclass / randomclass / classrandom', DESC = 'Picks a random class (CS5)'}
 CMDs[#CMDs + 1] = {NAME = '', DESC = ''}
 CMDs[#CMDs + 1] = {NAME = 'discord / support / help', DESC = 'Invite to the Infinite Yield support server.'}
 CMDs[#CMDs + 1] = {NAME = 'console', DESC = 'Loads old Roblox console'}
@@ -11731,19 +11728,23 @@ addcmd('loadmap',{'replacemap'}, function(args, speaker)
 		end
 	end
 
-	if string.lower(str) ~= "random" then
+	if string.lower(str) == "random" and table.getn(p:GetChildren()) >= 1 then
+		local mr = math.random(1, table.getn(p:GetChildren()))
+		
+		for i, c in pairs(p:GetChildren()) do
+			if i == mr then
+				str = c.Name
+			end
+		end
+	elseif string.lower(str) == "all" then
+		for i, c in pairs(game.ReplicatedStorage.Part:GetChildren()) do
+			effectapply(workspace.SuperDummy, c.Map, map)
+		end
+	elseif table.getn(p:GetChildren()) >= 1 then
 		for i, c in pairs(p:GetChildren()) do
 			local ssp = string.split(string.lower(c.Name), string.lower(str))
 
 			if ssp[1] and ssp[2] then
-				str = c.Name
-			end
-		end
-	elseif table.getn(p:GetChildren()) >= 1 then
-		local mr = math.random(1, table.getn(p:GetChildren()))
-
-		for i, c in pairs(p:GetChildren()) do
-			if i == mr then
 				str = c.Name
 			end
 		end
@@ -11760,12 +11761,16 @@ addcmd('ifs',{'instantfinal', 'instantfinalstrike'}, function(args, speaker)
 
 	for i, c in pairs(workspace:GetChildren()) do
 		if c:FindFirstChild'Map' then
-			map = c.Map
+			map = c
 		end
 	end
 
-	if map and map:FindFirstChild'Outer' then
-		effectapply(workspace.SuperDummy, game.ReplicatedStorage.Effects.StealthWarning.Effect, map.Outer)
+	if map then
+		for i, c in pairs(map:GetChildren()) do
+			if c:IsA'Model' then
+				effectapply(workspace.SuperDummy, game.ReplicatedStorage.Effects.StealthWarning.Effect, c.Outer)
+			end
+		end
 	end
 end)
 
