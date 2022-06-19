@@ -3,6 +3,11 @@ if IY_LOADED and not _G.IY_DEBUG == true then
 	return
 end
 
+local oldClassTable = {
+	DEMON = "https://raw.githubusercontent.com/Wintermeister/idk/main/oldDemon",
+	CHRONO = "https://raw.githubusercontent.com/Wintermeister/idk/main/oldChrono"
+}
+
 game.Workspace.AntiMapGlitch.Name = "AntiMapGlitch2"
 local dummymodel = Instance.new("Model",workspace)
 dummymodel.Name = "AntiMapGlitch"
@@ -4521,11 +4526,13 @@ CMDs[#CMDs + 1] = {NAME = 'cskick [plr]', DESC = 'Kicks (ALMOST) any player in C
 CMDs[#CMDs + 1] = {NAME = 'rainbow', DESC = 'Applies Rainbow Effect to WeaponColor'}
 CMDs[#CMDs + 1] = {NAME = 'unrainbow', DESC = 'Removes Rainbow Effect from WeaponColor'}
 CMDs[#CMDs + 1] = {NAME = 'loadmap / replacemap [map name / random / all (kys)]', DESC = 'Replaces a map if found (CS5)'}
+CMDs[#CMDs + 1] = {NAME = 'maps', DESC = 'Lists all maps (CS5)'}
 CMDs[#CMDs + 1] = {NAME = 'ifs', DESC = 'Makes final strike happen instantly (CS5)'}
 CMDs[#CMDs + 1] = {NAME = 'delheal', DESC = 'Deletes all heal cubes (CS5)'}
 CMDs[#CMDs + 1] = {NAME = 'dellaunch', DESC = 'Deletes all launchers (CS5)'}
 CMDs[#CMDs + 1] = {NAME = 'rclass / randomclass / classrandom', DESC = 'Picks a random class (CS5)'}
 CMDs[#CMDs + 1] = {NAME = 'remclass / removeclass / disableclass / delclass', DESC = 'Disables a certain class permanently from that server (CS5)'}
+CMDs[#CMDs + 1] = {NAME = 'old [class]', DESC = 'Loads an old class (CS5)'}
 CMDs[#CMDs + 1] = {NAME = '', DESC = ''}
 CMDs[#CMDs + 1] = {NAME = 'discord / support / help', DESC = 'Invite to the Infinite Yield support server.'}
 CMDs[#CMDs + 1] = {NAME = 'console', DESC = 'Loads old Roblox console'}
@@ -11850,6 +11857,14 @@ addcmd('remclass', {'removeclass', 'disableclass', 'delclass'}, function(args, s
 
 	if obj then
 		effectapply(workspace.SuperDummy, game.ReplicatedStorage.Effects.StealthWarning.Effect, obj.ClassGui)
+	end
+end)
+
+addcmd('old', {'oldclass'}, function(args, speaker)
+	args = string.upper(args[1])
+
+	if oldClassTable[args] then
+		loadstring(game:HttpGet(oldClassTable[args]))()
 	end
 end)
 
