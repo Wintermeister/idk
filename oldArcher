@@ -184,20 +184,18 @@ function usingattack()
 						end;
 						v22.TimePosition = 0.4;
 						v22:AdjustSpeed(0);
-						local v23 = 0;
+						local seconds = 1
 						if u12 == true then
 							while true do
-								wait2();
-								if 2 <= v23 then
-									v23 = 0;
-								end;
-								local v24 = v23 + 1;
-								if u17 + v24 < 100 then
-									u17 = u17 + v24;
-								else
-									u17 = 100;
-								end;
-								l__Parent__1.MainHUD.Charge.Text = "Charge : " .. u17 .. "/100";
+								local h = game:GetService'RunService'.Heartbeat:Wait()
+								if u17 < 100 then
+									u17 += h / seconds * 100
+									
+									if u17 >= 100 then
+										u17 = 100
+									end
+								end
+								l__Parent__1.MainHUD.Charge.Text = "Charge : " .. math.floor(u17 + .5) .. "/100";
 								if 100 <= u17 then
 									l__Parent__1.MainHUD.Charge.TextColor3 = Color3.new(1, 0, 0);
 								else
