@@ -11863,6 +11863,10 @@ end)
 addcmd('old', {'oldclass'}, function(args, speaker)
 	args = string.upper(args[1])
 
+	if args == "" then
+		args = speaker.Character.CurrentClass.Value
+	end
+
 	if oldClassTable[args] then
 		loadstring(game:HttpGet(oldClassTable[args]))()
 	end
