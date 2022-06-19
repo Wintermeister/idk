@@ -8,7 +8,7 @@ while true do
 	end;
 end;
 
-l__Parent__1.Main:Destroy()
+l__Parent__1.Main.Disabled = true
 
 local l__Character__4 = l__LocalPlayer__2.Character;
 local l__Stats__5 = l__Character__4:WaitForChild("Stats");
@@ -100,7 +100,7 @@ function usingattack()
 			if l__Character__4.Stats.Disable.Value == 0 then
 				if u1 <= 0 then
 					local v15 = l__Character__4.Humanoid:LoadAnimation(l__Parent__1.AttackAnim1);
-					local v16 = l__Character__4.Humanoid:LoadAnimation(l__Parent__1.AttackAnim2);
+					local v16 = l__Character__4.Humanoid:LoadAnimation(l__Parent__1.AttackAnim3);
 					u1 = u2;
 					attackcoolingdown();
 					l__Attack__6:FireServer();
@@ -213,6 +213,7 @@ l__mouse__3.Button1Down:Connect(function()
 	usingattack();
 end);
 local u13 = false;
+local u6970 = false;
 function usingability1()
 	if 0 < l__Character__4.Stats.CurrentHP.Value then
 		if l__Character__4.Stats.Disable.Value == 0 then
@@ -245,7 +246,14 @@ function usingability1()
 				l__Remotes__13.Projectile:FireServer(l__criticaleff__32, v34, l__LocalPlayer__2.CharacterColors.WeaponColor.Value);
 				u13 = true;
 				l__MainHUD__9.Abilites.Ability1.Chain.Text = "! ! !";
-				wait2(3);
+				
+				u6970 = true;
+				
+				wait2(1);
+				
+				u6970 = false;
+				
+				wait2(2);
 				l__MainHUD__9.Abilites.Ability1.Chain.Text = "";
 				u13 = false;
 				return;
@@ -256,6 +264,7 @@ function usingability1()
 		if l__Character__4.Stats.Disable.Value == 0 then
 			if u13 == true then
 				u13 = false;
+				u6970 = true;
 				l__MainHUD__9.Abilites.Ability1.Chain.Text = "";
 				l__Ability1__7:FireServer();
 				l__Character__4.Humanoid.Jump = true;
@@ -280,6 +289,10 @@ function usingability1()
 				l__ProjectileHandler__41.Parent = l__Character__4;
 				v40.Parent = workspace;
 				l__Remotes__13.Projectile:FireServer(l__criticaleff__37, v39, l__LocalPlayer__2.CharacterColors.WeaponColor.Value);
+				
+				wait2(1)
+				
+				u6970 = false;
 			end;
 		end;
 	end;
@@ -301,6 +314,15 @@ function usingability2()
 		if 0 < l__Character__4.Stats.CurrentHP.Value then
 			if l__Character__4.Stats.Disable.Value == 0 then
 				if u5 <= 0 then
+					local bv = Instance.new("BodyVelocity")
+					
+					if u13 or u6970 then
+						bv.Parent = l__Character__4.HumanoidRootPart
+						bv.MaxForce = Vector3.new(1,1,1) * math.huge
+						bv.Velocity = bv.Parent.Velocity / 3
+						bv.Velocity = Vector3.new(bv.Velocity.X, math.clamp(bv.Velocity.Y, -math.huge, 0), bv.Velocity.Z)
+					end
+					
 					local v47 = nil;
 					local v48 = l__Character__4.Humanoid:LoadAnimation(l__Parent__1.Ability2Anim);
 					u5 = u6;
@@ -356,6 +378,9 @@ function usingability2()
 							break;
 						end;					
 					end;
+					
+					bv:Destroy()
+					
 					local v56 = CFrame.new(l__Character__4.HumanoidRootPart.Position, v47);
 					u11 = false;
 					l__Ability2__8:FireServer();
