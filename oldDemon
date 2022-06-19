@@ -244,6 +244,9 @@ function usingability1()
 				l__ProjectileHandler__36.Parent = l__Character__4;
 				v35.Parent = workspace;
 				l__Remotes__13.Projectile:FireServer(l__criticaleff__32, v34, l__LocalPlayer__2.CharacterColors.WeaponColor.Value);
+				
+				wait()
+				
 				u13 = true;
 				l__MainHUD__9.Abilites.Ability1.Chain.Text = "! ! !";
 				
