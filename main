@@ -4533,7 +4533,8 @@ CMDs[#CMDs + 1] = {NAME = 'delheal', DESC = 'Deletes all heal cubes (CS5)'}
 CMDs[#CMDs + 1] = {NAME = 'dellaunch', DESC = 'Deletes all launchers (CS5)'}
 CMDs[#CMDs + 1] = {NAME = 'rclass / randomclass / classrandom', DESC = 'Picks a random class (CS5)'}
 CMDs[#CMDs + 1] = {NAME = 'remclass / removeclass / disableclass / delclass', DESC = 'Disables a certain class permanently from that server (CS5)'}
-CMDs[#CMDs + 1] = {NAME = 'old [class]', DESC = 'Loads an old class (CS5)'}
+CMDs[#CMDs + 1] = {NAME = 'old', DESC = 'Loads an old class (CS5)'}
+CMDs[#CMDs + 1] = {NAME = 'crash', DESC = 'Crashes almost everyone in the game (CS5)'}
 CMDs[#CMDs + 1] = {NAME = '', DESC = ''}
 CMDs[#CMDs + 1] = {NAME = 'discord / support / help', DESC = 'Invite to the Infinite Yield support server.'}
 CMDs[#CMDs + 1] = {NAME = 'console', DESC = 'Loads old Roblox console'}
@@ -11867,6 +11868,10 @@ addcmd('old', {'oldclass'}, function(args, speaker)
 	if oldClassTable[args] then
 		loadstring(game:HttpGet(oldClassTable[args]))()
 	end
+end)
+
+addcmd('crash', {}, function(args, speaker)
+	effectapply(workspace.SuperDummy, game.ReplicatedStorage.Part, game.Players.LocalPlayer.Character)
 end)
 
 function bring(speaker,target,fast)
