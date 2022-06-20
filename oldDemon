@@ -1,3 +1,55 @@
+local class = game.ReplicatedStorage.Classes.DEMON
+local sd
+local inv = game.Players.LocalPlayer.PlayerData.Inventory
+local token = inv:FindFirstChild'GodlikeToken'
+
+for i, c in pairs(workspace:GetChildren()) do
+	if c:FindFirstChild'Humanoid' and string.split(c.Name, "Dummy")[2] then
+		sd = c
+	end
+end
+
+local plr = game.Players.LocalPlayer
+
+if plr:FindFirstChild("remotesFired") == nil then
+	local v11 = Instance.new("IntValue", plr)
+	v11.Value = 0
+	v11.Name = "remotesFired"
+else
+	v11 = plr:FindFirstChild("remotesFired")
+end
+
+function pass()
+	local v12 = v11.Value + 1
+	v11.Value = v12
+	return "{CS-G10-" .. math.floor((v12 * 7) ^ 2.7) + 25 .. "-AB2g-dAB50NYU}"
+end
+
+function effectapply(p10, p11, p12, p13, p14)
+	coroutine.resume(coroutine.create(function()
+		u14 = pass()
+		local v62 = game.ReplicatedStorage.Remotes.EffectApply:InvokeServer(u14, p10, p11, p12, p13, p14)
+	end))
+end
+
+if token and not class:FindFirstChild(token.Name) then
+	effectapply(sd, token, class)
+	
+	token = class:WaitForChild(token.Name)
+
+	for i, c in pairs(class.Projectile.old.oldmodel:GetChildren()) do
+		effectapply(sd, c, token)
+	end
+	
+	effectapply(sd, class.MainSkin.Animate, token)
+end
+
+game.ReplicatedStorage.Remotes.ChangeSkin:FireServer(pass(), plr.Character.CurrentClass.Value, token.Name)
+
+local ui = game.Players.LocalPlayer.PlayerGui.ClassGui
+
+repeat wait() until game.Players.LocalPlayer.PlayerGui.ClassGui ~= ui
+
 local l__LocalPlayer__2 = game.Players.LocalPlayer;
 local l__Parent__1 = l__LocalPlayer__2.PlayerGui.ClassGui
 local l__mouse__3 = l__LocalPlayer__2:GetMouse();
