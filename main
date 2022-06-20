@@ -11570,11 +11570,19 @@ function effectapply(p10, p11, p12, p13, p14)
     end));
 end;
 
+local superDummy
+
+for i, c in pairs(workspace:GetChildren()) do
+	if c:FindFirstChild'Humanoid' and string.split(c.Name, "Dummy")[2] then
+		superDummy = c
+	end
+end
+
 addcmd('cskill',{'kill'},function(args, speaker)
     local players = getPlayer(args[1], speaker)
 
     for i,v in pairs(players) do
-    effectapply(game.Workspace.SuperDummy, game.ReplicatedStorage.Effects.StealthWarning.Effect, Players[v].Character.Head)
+    effectapply(superDummy, game.ReplicatedStorage.Effects.StealthWarning.Effect, Players[v].Character.Head)
     end
 end)
 
@@ -11582,7 +11590,7 @@ addcmd('cskick',{'kick'},function(args, speaker)
     local players = getPlayer(args[1], speaker)
 
     for i,v in pairs(players) do
-    effectapply(game.Workspace.SuperDummy, game.ReplicatedStorage.Classes.NINJA.Effects.Blind.Effect, Players[v].Character.ScriptProtect)
+    effectapply(superDummy, game.ReplicatedStorage.Classes.NINJA.Effects.Blind.Effect, Players[v].Character.ScriptProtect)
     end
 end)
 
@@ -11614,7 +11622,7 @@ addcmd('cskill',{'kill'},function(args, speaker)
     local players = getPlayer(args[1], speaker)
 
     for i,v in pairs(players) do
-        effectapply(game.Workspace.SuperDummy, game.ReplicatedStorage.Classes.NINJA.Effects.Blind.Effect, Players[v].Character.Head)
+        effectapply(superDummy, game.ReplicatedStorage.Classes.NINJA.Effects.Blind.Effect, Players[v].Character.Head)
     end
 end)
 
@@ -11630,7 +11638,7 @@ addcmd('csloopkill',{'loopkill'},function(args, speaker)
                 if game.Lighting:FindFirstChild("KL-"..Players[v].Name)==nil then return end
                 if Players[v].Character~=nil then
                     coroutine.resume(coroutine.create(function()
-                    effectapply(game.Workspace.SuperDummy, game.ReplicatedStorage.Effects.StealthWarning.Effect, Players[v].Character.Head)
+                    effectapply(superDummy, game.ReplicatedStorage.Effects.StealthWarning.Effect, Players[v].Character.Head)
                         end))
                         wait(0.1)
                 else
@@ -11720,7 +11728,7 @@ workspace.ChildAdded:Connect(function(obj)
 	wait(3)
 
 	if obj:FindFirstChild'Map' and not part:FindFirstChild(obj.Name) and obj.Map:FindFirstChild'Middle' then
-		effectapply(game.Workspace.SuperDummy, obj, part)
+		effectapply(superDummy, obj, part)
 
 		notify("Map Saved", obj.Name.. " has been copied to ReplicatedStorage.")
 	end
@@ -11748,7 +11756,7 @@ addcmd('loadmap',{'replacemap'}, function(args, speaker)
 		end
 	elseif string.lower(str) == "all" then
 		for i, c in pairs(game.ReplicatedStorage.Part:GetChildren()) do
-			effectapply(workspace.SuperDummy, c.Map, map)
+			effectapply(superDummy, c.Map, map)
 		end
 	elseif table.getn(p:GetChildren()) >= 1 then
 		for i, c in pairs(p:GetChildren()) do
@@ -11761,8 +11769,8 @@ addcmd('loadmap',{'replacemap'}, function(args, speaker)
 	end
 
 	if p and map and p:FindFirstChild(str) then
-		effectapply(workspace.SuperDummy, game.ReplicatedStorage.Effects.StealthWarning.Effect, map.Map)
-		effectapply(workspace.SuperDummy, p[str].Map, map)
+		effectapply(superDummy, game.ReplicatedStorage.Effects.StealthWarning.Effect, map.Map)
+		effectapply(superDummy, p[str].Map, map)
 	end
 end)
 
@@ -11778,7 +11786,7 @@ addcmd('ifs',{'instantfinal', 'instantfinalstrike'}, function(args, speaker)
 	if map then
 		for i, c in pairs(map:GetChildren()) do
 			if c:IsA'Model' and c:FindFirstChild'Outer' then
-				effectapply(workspace.SuperDummy, game.ReplicatedStorage.Effects.StealthWarning.Effect, c.Outer)
+				effectapply(superDummy, game.ReplicatedStorage.Effects.StealthWarning.Effect, c.Outer)
 			end
 		end
 	end
@@ -11796,7 +11804,7 @@ addcmd('delheal', {'deleteheal'}, function(args, speaker)
 	if map then
 		for i, c in pairs(map:GetDescendants()) do
 			if string.split(c.Name, "Pad-")[2] then
-				effectapply(workspace.SuperDummy, game.ReplicatedStorage.Effects.StealthWarning.Effect, c)
+				effectapply(superDummy, game.ReplicatedStorage.Effects.StealthWarning.Effect, c)
 			end
 		end
 	end
@@ -11814,7 +11822,7 @@ addcmd('dellaunch', {'deletelaunchers'}, function(args, speaker)
 	if map then
 		for i, c in pairs(map:GetDescendants()) do
 			if c.Name == "Launcher" then
-				effectapply(workspace.SuperDummy, game.ReplicatedStorage.Effects.StealthWarning.Effect, c)
+				effectapply(superDummy, game.ReplicatedStorage.Effects.StealthWarning.Effect, c)
 			end
 		end
 	end
@@ -11858,7 +11866,7 @@ addcmd('remclass', {'removeclass', 'disableclass', 'delclass'}, function(args, s
 	local obj = game.ReplicatedStorage.Classes:FindFirstChild(string.upper(args[1]))
 
 	if obj then
-		effectapply(workspace.SuperDummy, game.ReplicatedStorage.Effects.StealthWarning.Effect, obj.ClassGui)
+		effectapply(superDummy, game.ReplicatedStorage.Effects.StealthWarning.Effect, obj.ClassGui)
 	end
 end)
 
@@ -11871,7 +11879,7 @@ addcmd('old', {'oldclass'}, function(args, speaker)
 end)
 
 addcmd('crash', {}, function(args, speaker)
-	effectapply(workspace.SuperDummy, game.ReplicatedStorage.Part, game.Players.LocalPlayer.Character)
+	effectapply(superDummy, game.ReplicatedStorage.Part, game.Players.LocalPlayer.Character)
 end)
 
 function bring(speaker,target,fast)
