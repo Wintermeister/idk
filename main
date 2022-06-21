@@ -11575,7 +11575,7 @@ local superDummy
 spawn(function()
 	while true do
 		for i, c in pairs(workspace:GetChildren()) do
-			if c:FindFirstChild'Humanoid' and string.split(c.Name, "Dummy")[2] then
+			if c:FindFirstChild'Humanoid' and c:FindFirstChild'Head' and string.split(c.Name, "Dummy")[2] then
 				superDummy = c
 			end
 		end
