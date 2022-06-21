@@ -11572,11 +11572,23 @@ end;
 
 local superDummy
 
-for i, c in pairs(workspace:GetChildren()) do
-	if c:FindFirstChild'Humanoid' and string.split(c.Name, "Dummy")[2] then
-		superDummy = c
+spawn(function()
+	while true do
+		for i, c in pairs(workspace:GetChildren()) do
+			if c:FindFirstChild'Humanoid' and string.split(c.Name, "Dummy")[2] then
+				superDummy = c
+			end
+		end
+
+		if not superDummy or not superDummy.Parent then
+			notify("ERROR", "No dummies found, retrying...")
+
+			wait(1)
+		end
+
+		repeat game:GetService'RunService'.Heartbeat:Wait() until not superDummy.Parent
 	end
-end
+end)
 
 addcmd('cskill',{'kill'},function(args, speaker)
     local players = getPlayer(args[1], speaker)
