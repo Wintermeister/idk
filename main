@@ -11894,6 +11894,49 @@ addcmd('crash', {}, function(args, speaker)
 	effectapply(superDummy, game.ReplicatedStorage.Part, game.Players.LocalPlayer.Character)
 end)
 
+addcmd('disguise', {}, function(args, speaker)
+	args = string.upper(args[1])
+
+	local baseClass = game.ReplicatedStorage.Classes:FindFirstChild(speaker.Character.CurrentClass.Value)
+	local secondaryClass = game.ReplicatedStorage.Classes:FindFirstChild(args)
+
+	local overrides = {
+		SCOUT = "TutorialComplete",
+		GUNNER = "SNIPERValentine",
+		WARRIOR = "HUNTERPrimal",
+		BERSERKER = "THIEFWicked",
+		MAGE = "ARCHERValentine",
+		WIZARD = "ARCHERWicked",
+		THIEF = "GUNNERAobing",
+		RECON = "GUNNERHaloangel",
+		PRIEST = "PRIESTHaloangel",
+		MEDIC = "MEDICWicked",
+		DEFENDER = "KNIGHTHaloangel",
+		KNIGHT = "ADMIRALCorrupted"
+	}
+
+	if baseClass and secondaryClass then
+		local inv = game.Players.LocalPlayer.PlayerData.Inventory
+		local token = inv:FindFirstChild(secondaryClass.Name)
+
+		if overrides[secondaryClass.Name] then
+			token = inv:FindFirstChild(overrides[secondaryClass.Name])
+		end
+		
+		if token and not baseClass:FindFirstChild(token.Name) then
+			effectapply(superDummy, token, baseClass)
+			
+			token = baseClass:WaitForChild(token.Name)
+			
+			for i, c  in pairs(secondaryClass.MainSkin:GetChildren()) do
+				effectapply(superDummy, c, token)
+			end
+		end
+
+		game.ReplicatedStorage.Remotes.ChangeSkin:FireServer(pass(), baseClass.Name, token.Name)
+	end
+end)
+
 function bring(speaker,target,fast)
 	if tools(speaker) then
 		if target ~= nil then
