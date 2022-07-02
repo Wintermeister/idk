@@ -11928,8 +11928,20 @@ addcmd('disguise', {}, function(args, speaker)
 			
 			token = baseClass:WaitForChild(token.Name)
 			
+			local extra = {
+				Extra = true
+			}
+			
 			for i, c  in pairs(secondaryClass.MainSkin:GetChildren()) do
-				effectapply(superDummy, c, token)
+				if not extra[c.Name] then
+					effectapply(superDummy, c, token)
+				end
+			end
+			
+			for i, c in pairs(baseClass.MainSkin:GetChildren()) do
+				if extra[c.Name] then
+					effectapply(superDummy, c, token)
+				end
 			end
 		end
 
