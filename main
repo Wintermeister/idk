@@ -11904,15 +11904,15 @@ addcmd('disguise', {}, function(args, speaker)
 		SCOUT = "TutorialComplete",
 		GUNNER = "SNIPERValentine",
 		WARRIOR = "HUNTERPrimal",
-		BERSERKER = "THIEFWicked",
-		MAGE = "ARCHERValentine",
-		WIZARD = "ARCHERWicked",
-		THIEF = "GUNNERAobing",
-		RECON = "GUNNERHaloangel",
-		PRIEST = "PRIESTHaloangel",
-		MEDIC = "MEDICWicked",
-		DEFENDER = "KNIGHTHaloangel",
-		KNIGHT = "ADMIRALCorrupted"
+		BERSERKER = "TRICKSTERWoodland",
+		MAGE = "JESTERCorrupted",
+		WIZARD = "REAPERWicked",
+		THIEF = "BEASTPopstar",
+		RECON = "STALKERWoodland",
+		PRIEST = "PRIESTHaloAngel",
+		MEDIC = "CHARGERCorrupted",
+		DEFENDER = "MONKJourney",
+		KNIGHT = "BLASTERHaloAngel"
 	}
 
 	if baseClass and secondaryClass then
