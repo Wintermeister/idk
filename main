@@ -4524,6 +4524,7 @@ CMDs[#CMDs + 1] = {NAME = 'cskill [plr]', DESC = 'Kills any player in Critical S
 CMDs[#CMDs + 1] = {NAME = 'csloopkill [plr]', DESC = 'Loopkills any player in Critical Strike'}
 CMDs[#CMDs + 1] = {NAME = 'csunloopkill [plr]', DESC = 'Disables the loopkill cmd on any player'}
 CMDs[#CMDs + 1] = {NAME = 'cskick [plr]', DESC = 'Kicks (ALMOST) any player in Critical Strike'}
+CMDs[#CMDs + 1] = {NAME = 'csserverban [plr]', DESC = 'Server bans (ALMOST) any player in Critical Strike'}
 CMDs[#CMDs + 1] = {NAME = 'rainbow', DESC = 'Applies Rainbow Effect to WeaponColor'}
 CMDs[#CMDs + 1] = {NAME = 'unrainbow', DESC = 'Removes Rainbow Effect from WeaponColor'}
 CMDs[#CMDs + 1] = {NAME = 'loadmap / replacemap [map name / random / all (kys)]', DESC = 'Replaces a map if found (CS5)'}
@@ -4535,6 +4536,7 @@ CMDs[#CMDs + 1] = {NAME = 'rclass / randomclass / classrandom', DESC = 'Picks a 
 CMDs[#CMDs + 1] = {NAME = 'remclass / removeclass / disableclass / delclass', DESC = 'Disables a certain class permanently from that server (CS5)'}
 CMDs[#CMDs + 1] = {NAME = 'old', DESC = 'Loads an old class (CS5)'}
 CMDs[#CMDs + 1] = {NAME = 'crash', DESC = 'Crashes almost everyone in the game (CS5)'}
+CMDs[#CMDs + 1] = {NAME = 'disguise', DESC = 'Disguises you as any class in the game (CS5)'}
 CMDs[#CMDs + 1] = {NAME = '', DESC = ''}
 CMDs[#CMDs + 1] = {NAME = 'discord / support / help', DESC = 'Invite to the Infinite Yield support server.'}
 CMDs[#CMDs + 1] = {NAME = 'console', DESC = 'Loads old Roblox console'}
@@ -11606,6 +11608,22 @@ addcmd('cskick',{'kick'},function(args, speaker)
     end
 end)
 
+addcmd('csserverban', {'serverban'}, function(args, speaker)
+	local players = getPlayer(args[1], speaker)
+
+    for i, plr in pairs(players) do
+		plr = plr.Name
+
+		spawn(function()
+			while true do
+				repeat wait() until game.Players:FindFirstChild(plr) and game.Players[plr].Character and game.Players[plr].Character:FindFirstChild'ScriptProtect'
+    			effectapply(sd, game.ReplicatedStorage.Classes.NINJA.Effects.Blind.Effect, game.Players[plr].Character:WaitForChild'ScriptProtect')
+				wait()
+			end
+		end)
+    end
+end)
+
 addcmd('clientantikick',{'antikick'},function(args, speaker)
 	local mt = getrawmetatable(game)
 	local old = mt.__namecall
@@ -11904,15 +11922,15 @@ addcmd('disguise', {}, function(args, speaker)
 		SCOUT = "TutorialComplete",
 		GUNNER = "SNIPERValentine",
 		WARRIOR = "HUNTERPrimal",
-		BERSERKER = "TRICKSTERWoodland",
-		MAGE = "JESTERCorrupted",
-		WIZARD = "REAPERWicked",
-		THIEF = "BEASTPopstar",
-		RECON = "STALKERWoodland",
-		PRIEST = "PRIESTHaloAngel",
-		MEDIC = "CHARGERCorrupted",
-		DEFENDER = "MONKJourney",
-		KNIGHT = "BLASTERHaloAngel"
+		BERSERKER = "THIEFWicked",
+		MAGE = "ARCHERValentine",
+		WIZARD = "ARCHERWicked",
+		THIEF = "GUNNERAobing",
+		RECON = "GUNNERHaloangel",
+		PRIEST = "PRIESTHaloangel",
+		MEDIC = "MEDICWicked",
+		DEFENDER = "KNIGHTHaloangel",
+		KNIGHT = "ADMIRALCorrupted"
 	}
 
 	if baseClass and secondaryClass then
@@ -11931,14 +11949,14 @@ addcmd('disguise', {}, function(args, speaker)
 			local extra = {
 				Extra = true
 			}
-			
+
 			for i, c  in pairs(secondaryClass.MainSkin:GetChildren()) do
 				if not extra[c.Name] then
 					effectapply(superDummy, c, token)
 				end
 			end
-			
-			for i, c in pairs(baseClass.MainSkin:GetChildren()) do
+
+			for i, c  in pairs(baseClass.MainSkin:GetChildren()) do
 				if extra[c.Name] then
 					effectapply(superDummy, c, token)
 				end
