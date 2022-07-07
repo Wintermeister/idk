@@ -7,7 +7,8 @@ local oldClassTable = {
 	DEMON = "https://raw.githubusercontent.com/Wintermeister/idk/main/oldDemon",
 	CHRONO = "https://raw.githubusercontent.com/Wintermeister/idk/main/oldChrono",
 	ARCHER = "https://raw.githubusercontent.com/Wintermeister/idk/main/oldArcher",
-	DUELIST = "https://raw.githubusercontent.com/Wintermeister/idk/main/oldDuelist"
+	DUELIST = "https://raw.githubusercontent.com/Wintermeister/idk/main/oldDuelist",
+	FROST = "https://raw.githubusercontent.com/Wintermeister/idk/main/oldFrost"
 }
 
 game.Workspace.AntiMapGlitch.Name = "AntiMapGlitch2"
