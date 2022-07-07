@@ -343,6 +343,10 @@ l__Character__4.CounterFolder.ChildAdded:Connect(function(p4)
 		effectapply(l__Character__4, game.ReplicatedStorage.Classes.JUGGERNAUT.Effects.AttackBuff, l__Character__4.Head);
 	end;
 end);
+
+local a2a = Instance.new("Animation", cgui)
+a2a.AnimationId = "rbxassetid://2197620543"
+
 local u15 = false;
 function usingability2()
 	if u11 == false then
@@ -387,13 +391,19 @@ function usingability2()
 		end;
 	end;
 end;
+
+local ca1 = Instance.new("Animation", cgui)
+ca1.AnimationId = "rbxassetid://2033759458"
+local ca2 = Instance.new("Animation", cgui)
+ca2.AnimationId = "rbxassetid://2033606768"
+
 function usingcritical()
 	if u11 == false then
 		if 0 < l__Character__4.Stats.CurrentHP.Value then
 			if l__Character__4.Stats.Disable.Value == 0 then
 				if u7 <= 0 then
-					local v47 = l__Character__4.Humanoid:LoadAnimation(cgui.CriticalAnim1);
-					local v48 = l__Character__4.Humanoid:LoadAnimation(cgui.CriticalAnim2);
+					local v47 = l__Character__4.Humanoid:LoadAnimation(ca1);
+					local v48 = l__Character__4.Humanoid:LoadAnimation(ca2);
 					u7 = u8;
 					criticalcoolingdown();
 					v47:Play();
@@ -804,3 +814,4 @@ l__MainHUD__9.Abilites.Attack.MouseButton1Click:connect(usingattack);
 l__MainHUD__9.Abilites.Ability1.MouseButton1Click:connect(usingability1);
 l__MainHUD__9.Abilites.Ability2.MouseButton1Click:connect(usingability2);
 l__MainHUD__9.Abilites.Critical.MouseButton1Click:connect(usingcritical);
+
