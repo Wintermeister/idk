@@ -264,11 +264,15 @@ l__mouse__3.Button1Down:Connect(function()
 	end;
 	usingattack();
 end);
+
+local a1a = Instance.new("Animation", cgui)
+a1a.AnimationId = "rbxassetid://1285230850"
+
 function usingability1()
 	if 0 < l__Character__4.Stats.CurrentHP.Value then
 		if l__Character__4.Stats.Disable.Value == 0 then
 			if u3 <= 0 then
-				local v26 = l__Character__4.Humanoid:LoadAnimation(cgui.Ability1Anim);
+				local v26 = l__Character__4.Humanoid:LoadAnimation(a1a)
 				u3 = u4;
 				ability1coolingdown();
 				l__Ability1__7:FireServer();
@@ -333,17 +337,126 @@ function usingability1()
 		end;
 	end;
 end;
+
+local a2a = Instance.new("Animation", cgui)
+a2a.AnimationId = "rbxassetid://1285230850"
+
 function usingability2()
 	if 0 < l__Character__4.Stats.CurrentHP.Value then
 		if l__Character__4.Stats.Disable.Value == 0 then
 			if u5 <= 0 then
-				local v37 = l__Character__4.Humanoid:LoadAnimation(cgui.Ability2Anim);
+				local function proj(obj)
+					spawn(function()
+						local l__Value__1 = obj
+						local l__Value__2 = l__Value__1.Origin.Value;
+						if game.Players.LocalPlayer:FindFirstChild("remotesFired") == nil then
+							local v3 = Instance.new("IntValue", game.Players.LocalPlayer);
+							v3.Value = 0;
+							v3.Name = "remotesFired";
+						else
+							v3 = game.Players.LocalPlayer:FindFirstChild("remotesFired");
+						end;
+						function pass()
+							local v4 = v3.Value + 1;
+							v3.Value = v4;
+							return "{CS-G10-" .. math.floor((v4 * 7) ^ 2.7) + 25 .. "-AB2g-dAB50NYU}";
+						end;
+						game.Debris:AddItem(l__Value__1, 10);
+						game.Debris:AddItem(script, 10);
+						local v5 = game.ReplicatedStorage.Projectiles.limitrange:Clone();
+						v5.CFrame = l__Value__1.CFrame * CFrame.new(0, 0, -l__Value__1.Range.Value);
+						v5.Parent = l__Value__1;
+						local v6 = Instance.new("BodyVelocity", l__Value__1);
+						v6.Velocity = l__Value__1.CFrame.lookVector * l__Value__1.Speed.Value;
+						v6.MaxForce = Vector3.new(math.huge, math.huge, math.huge);
+						local u1 = nil;
+						function damage(p1, p2)
+							coroutine.resume(coroutine.create(function()
+								u1 = pass();
+								local v7 = game.ReplicatedStorage.Remotes.Damage:InvokeServer(u1, workspace.RealTime.Value, p1, p2);
+							end));
+						end;
+						function effectapply(p3, p4, p5, p6, p7)
+							coroutine.resume(coroutine.create(function()
+								u1 = pass();
+								local v8 = game.ReplicatedStorage.Remotes.EffectApply:InvokeServer(u1, p3, p4, p5, p6, p7);
+							end));
+						end;
+						local u2 = true;
+						local function ended(p8)
+							u2 = false;
+							l__Value__1.Anchored = true;
+							local v9 = 1 - 1;
+							while true do
+								wait(0.01);
+								l__Value__1.Transparency = l__Value__1.Transparency + 0.1;
+								if 0 <= 1 then
+									if v9 < 10 then
+
+									else
+										break;
+									end;
+								elseif 10 < v9 then
+
+								else
+									break;
+								end;
+								v9 = v9 + 1;	
+							end;
+							l__Value__1:Destroy();
+						end;
+						local l__Value__3 = l__Value__1.Owner.Value;
+						local l__LocalPlayer__4 = game.Players.LocalPlayer;
+						l__Value__1.Touched:connect(function(p9)
+							if p9.Parent ~= nil and (p9.Parent:FindFirstChild("Humanoid") and u2 == true) then
+								local l__Parent__10 = p9.Parent;
+								if l__Parent__10 == l__Value__3.Character then
+									return;
+								end;
+								if l__Parent__10.Stats.CurrentHP.Value <= 0 then
+									return;
+								end;
+								if l__Parent__10.Stats.Safe.Value > 0 then
+									return;
+								end;
+								if l__LocalPlayer__4.Character:FindFirstChild("Team") and l__Parent__10:FindFirstChild("Team") and l__LocalPlayer__4.Character.Team.Value == l__Parent__10.Team.Value then
+									return;
+								end;
+								if l__LocalPlayer__4 == l__Value__3 then
+									if p9.Parent:FindFirstChild("Ability2") and p9.Parent:FindFirstChild(l__Value__3.Name) then
+										return;
+									end;
+									local v11 = Instance.new("StringValue");
+									v11.Name = "Ability2";
+									v11.Parent = p9.Parent;
+									local v12 = Instance.new("StringValue");
+									v12.Name = l__Value__3.Name;
+									v12.Parent = p9.Parent;
+									game.Debris:AddItem(v11, 1);
+									game.Debris:AddItem(v12, 1);
+									effectapply(l__Parent__10, game.ReplicatedStorage.Classes.FROST.Effects.Frostbite, l__Parent__10.Head);
+									damage(l__Parent__10, l__Value__1.Damage.Value);
+								end;
+							end;
+							if p9.Name == "limitrange" and p9.Parent == l__Value__1 and u2 == true then
+								ended();
+							end;
+							if p9:FindFirstChild("LobbyWall") and u2 == true then
+								ended();
+							end;
+						end)
+				end);
+
+									
+				end
+				
+				local v37 = l__Character__4.Humanoid:LoadAnimation(a2a);
 				u5 = u6;
 				ability2coolingdown();
 				l__Ability2__8:FireServer();
 				v37:Play();
 				wait2(0.1);
-				local l__ability2__38 = game.ReplicatedStorage.Classes.FROST.Projectile.ability2;
+				local l__ability2__38 = game.ReplicatedStorage.Classes.FROST.Projectile.old2.ability2;
 				local v39 = l__Character__4.HumanoidRootPart.CFrame * CFrame.new(0, 0, -2) * CFrame.Angles(0, 0, math.pi / 2);
 				local v40 = l__ability2__38:Clone();
 				v40.Owner.Value = l__LocalPlayer__2;
@@ -352,10 +465,12 @@ function usingability2()
 				v40.Color = l__LocalPlayer__2.CharacterColors.WeaponColor.Value;
 				v40.Speed.Value = v40.Speed.Value;
 				local l__ProjectileHandler__41 = v40.ProjectileHandler;
-				l__ProjectileHandler__41.Projectile.Value = v40;
-				l__ProjectileHandler__41.Parent = l__Character__4;
+				l__ProjectileHandler__41:Destroy()
 				v40.Parent = workspace;
 				l__Remotes__12.Projectile:FireServer(l__ability2__38, v39, l__LocalPlayer__2.CharacterColors.WeaponColor.Value);
+				
+				proj(v40)
+				
 				local v42 = l__Character__4.HumanoidRootPart.CFrame * CFrame.new(0, 0, -2) * CFrame.Angles(0, math.pi / 12, math.pi / 2);
 				local v43 = l__ability2__38:Clone();
 				v43.Owner.Value = l__LocalPlayer__2;
@@ -364,10 +479,12 @@ function usingability2()
 				v43.Color = l__LocalPlayer__2.CharacterColors.WeaponColor.Value;
 				v43.Speed.Value = v43.Speed.Value;
 				local l__ProjectileHandler__44 = v43.ProjectileHandler;
-				l__ProjectileHandler__44.Projectile.Value = v43;
-				l__ProjectileHandler__44.Parent = l__Character__4;
+				l__ProjectileHandler__44:Destroy()
 				v43.Parent = workspace;
 				l__Remotes__12.Projectile:FireServer(l__ability2__38, v42, l__LocalPlayer__2.CharacterColors.WeaponColor.Value);
+				
+				proj(v43)
+				
 				local v45 = l__Character__4.HumanoidRootPart.CFrame * CFrame.new(0, 0, -2) * CFrame.Angles(0, -math.pi / 12, math.pi / 2);
 				local v46 = l__ability2__38:Clone();
 				v46.Owner.Value = l__LocalPlayer__2;
@@ -376,10 +493,11 @@ function usingability2()
 				v46.Color = l__LocalPlayer__2.CharacterColors.WeaponColor.Value;
 				v46.Speed.Value = v46.Speed.Value;
 				local l__ProjectileHandler__47 = v46.ProjectileHandler;
-				l__ProjectileHandler__47.Projectile.Value = v46;
-				l__ProjectileHandler__47.Parent = l__Character__4;
+				l__ProjectileHandler__47:Destroy()
 				v46.Parent = workspace;
 				l__Remotes__12.Projectile:FireServer(l__ability2__38, v45, l__LocalPlayer__2.CharacterColors.WeaponColor.Value);
+				
+				proj(v46)
 			end;
 		end;
 	end;
