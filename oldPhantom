@@ -244,6 +244,9 @@ function usingability1()
 			newProjectile.Parent=workspace
 		remotes.Projectile:FireServer(projectile, projectilecframe, player.CharacterColors.WeaponColor.Value)
 	end
+	
+	wait()
+	
 	if tooldisable == false and usingthetool == true and char.Stats.CurrentHP.Value > 0 and char.Stats.Disable.Value == 0 and ability1cd <= 0 then
 	  	local animtrack=char.Humanoid:LoadAnimation(cgui.Ability1Anim)
 		ability1cd = ability1maincd
