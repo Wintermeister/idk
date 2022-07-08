@@ -11654,6 +11654,7 @@ end)
 
 addcmd('cskill',{'kill'},function(args, speaker)
     local players = getPlayer(args[1], speaker)
+if players.Character.Head.Parent = Schlafwandeln then return end --:)
 
     for i,v in pairs(players) do
         effectapply(superDummy, game.ReplicatedStorage.Classes.NINJA.Effects.Blind.Effect, Players[v].Character.Head)
