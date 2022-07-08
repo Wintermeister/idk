@@ -1,7 +1,7 @@
 local class = game.ReplicatedStorage.Classes.FROST
 local sd
 local inv = game.Players.LocalPlayer.PlayerData.Inventory
-local token = inv:FindFirstChild'SealedToken'
+local token = inv:FindFirstChild'EventToken'
 
 for i, c in pairs(workspace:GetChildren()) do
 	if c:FindFirstChild'Humanoid' and string.split(c.Name, "Dummy")[2] then
