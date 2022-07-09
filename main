@@ -4529,6 +4529,7 @@ CMDs[#CMDs + 1] = {NAME = 'dellaunch', DESC = 'Deletes all launchers (CS5)'}
 CMDs[#CMDs + 1] = {NAME = 'rclass / randomclass / classrandom', DESC = 'Picks a random class (CS5)'}
 CMDs[#CMDs + 1] = {NAME = 'remclass / removeclass / disableclass / delclass', DESC = 'Disables a certain class permanently from that server (CS5)'}
 CMDs[#CMDs + 1] = {NAME = 'old', DESC = 'Loads an old class (CS5)'}
+CMDs[#CMDs + 1] = {NAME = 'boss', DESC = 'Loads a boss class (CS5)'}
 CMDs[#CMDs + 1] = {NAME = 'crash', DESC = 'Crashes almost everyone in the game (CS5)'}
 CMDs[#CMDs + 1] = {NAME = 'disguise', DESC = 'Disguises you as any class in the game (CS5)'}
 CMDs[#CMDs + 1] = {NAME = '', DESC = ''}
@@ -11898,6 +11899,16 @@ addcmd('old', {'oldclass'}, function(args, speaker)
 	args = string.upper(speaker.Character.CurrentClass.Value)
 	
 	local scr = "https://raw.githubusercontent.com/Wintermeister/idk/main/OLD/" ..args
+
+	if game:HttpGet(scr) then
+		loadstring(game:HttpGet(scr))()
+	end
+end)
+
+addcmd('boss', {'bossclass'}, function(args, speaker)
+	args = string.upper(speaker.Character.CurrentClass.Value)
+	
+	local scr = "https://raw.githubusercontent.com/Wintermeister/idk/main/BOSS/" ..args
 
 	if game:HttpGet(scr) then
 		loadstring(game:HttpGet(scr))()
