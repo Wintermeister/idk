@@ -1,0 +1,697 @@
+local plr = game.Players.LocalPlayer
+
+if plr:FindFirstChild("remotesFired") == nil then
+    local v11 = Instance.new("IntValue", plr)
+    v11.Value = 0
+    v11.Name = "remotesFired"
+else
+    v11 = plr:FindFirstChild("remotesFired")
+end
+
+function pass()
+    local v12 = v11.Value + 1
+    v11.Value = v12
+    return "{CS-G10-" .. math.floor((v12 * 7) ^ 2.7) + 25 .. "-AB2g-dAB50NYU}"
+end
+
+function effectapply(p10, p11, p12, p13, p14)
+    coroutine.resume(coroutine.create(function()
+        u14 = pass()
+        local v62 = game.ReplicatedStorage.Remotes.EffectApply:InvokeServer(u14, p10, p11, p12, p13, p14)
+    end))
+end
+
+local sd = workspace.SuperDummy
+local inv = game.Players.LocalPlayer.PlayerData.Inventory
+local token = inv:FindFirstChild'EventToken'
+
+if token and not game.ReplicatedStorage.Classes.RULER:FindFirstChild(token.Name) then
+	effectapply(sd, token, game.ReplicatedStorage.Classes.RULER)
+	
+	token = game.ReplicatedStorage.Classes.RULER:WaitForChild(token.Name)
+	
+	dels = {
+		RightArm = true,
+		LeftArm = true,
+		HandleRight = true
+	}
+
+	for i, c in pairs(game.ReplicatedStorage.Classes.RULER.MainSkin:GetChildren()) do
+		if not dels[c.Name] then
+			effectapply(workspace.SuperDummy, c, token)
+		end
+	end
+	
+	for i, c in pairs(game.ReplicatedStorage.Classes.DESTROYER.Primal:GetChildren()) do
+		if dels[c.Name] then
+			effectapply(sd, c, token)
+		elseif c.Name == "Extra" then
+			for i, cc in pairs(c:GetChildren()) do
+				effectapply(sd, cc, token:WaitForChild'Extra')
+			end
+		end
+	end
+end
+
+local ui = plr.PlayerGui.ClassGui
+local projRemote = game.ReplicatedStorage.Remotes.Projectile
+local weaponColor = plr.CharacterColors.WeaponColor
+local destroyer = game.ReplicatedStorage.Classes.DESTROYER
+local ruler = game.ReplicatedStorage.Classes.RULER
+
+game.ReplicatedStorage.Remotes.ChangeSkin:FireServer(pass(), plr.Character.CurrentClass.Value, "EventToken")
+
+repeat wait() until plr.PlayerGui.ClassGui ~= ui
+
+plr.Character.Stats.BaseSpeed.Value = 45
+
+for i = 1, 10 do
+	local spawnEff = game.ReplicatedStorage.Classes.CHRONO.Projectile.old.critical
+	local se = spawnEff:Clone()
+	se.Owner.Value = plr
+	se.Origin.Value = plr.Character.HumanoidRootPart.Position
+	se.CFrame = CFrame.new(se.Origin.Value)
+	se.Color = weaponColor.Value
+	local seph = se.ProjectileHandler
+	seph.Projectile.Value = se
+	seph.Parent = plr.Character
+
+	se.Parent = workspace
+
+	projRemote:FireServer(spawnEff, plr.Character.HumanoidRootPart.CFrame, weaponColor.Value)
+end
+
+ui = plr.PlayerGui.ClassGui
+local main = ui.MainHUD
+
+ui.Main.Disabled = true
+main.Height:Destroy()
+main.Missile:Destroy()
+
+function guicolorchange()
+	if main.Parent then
+		main.Abilites.Attack.Icon.ImageColor3 = weaponColor.Value
+		main.Abilites.Ability1.Icon.ImageColor3 = weaponColor.Value
+		main.Abilites.Ability2.Icon.ImageColor3 = weaponColor.Value
+		main.Abilites.Critical.Icon.ImageColor3 = weaponColor.Value
+	end
+end
+
+guicolorchange()
+
+weaponColor.Changed:Connect(guicolorchange)
+
+function createnewjetmodel()
+	local cf = plr.Character.HumanoidRootPart.CFrame
+	
+	local jm = game.ReplicatedStorage.Classes.RULER.Projectile.rulerjetmodel
+	local j = jm:Clone()
+	j.Owner.Value = plr
+	j.Origin.Value = cf.Position
+	j.CFrame = cf
+	j.Color = weaponColor.Value
+	local jph = j.ProjectileHandler
+	jph.Projectile.Value = j
+	jph.Parent = plr.Character
+	
+	j.Parent = workspace
+	
+	projRemote:FireServer(jm, cf, weaponColor.Value)
+end
+
+local hum = plr.Character.Humanoid
+
+function changeSpeed(ofs)
+	plr.Character.Humanoid.WalkSpeed = plr.Character.Stats.BaseSpeed.Value + plr.Character.Stats.ChangedSpeed.Value + ofs
+end
+
+local inAir = false
+
+local a2 = ui:WaitForChild'Attack2'
+local ab1a = ui:WaitForChild'Ability1a'
+local ab1b = ui:WaitForChild'Ability1b'
+
+local a0anim = hum:LoadAnimation(destroyer.ClassGui.Ability2Anim)
+local a1anim = hum:LoadAnimation(destroyer.ClassGui.Ability1Anim)
+local a2animAir = hum:LoadAnimation(ruler.ClassGui.AttackAnimFlight)
+local a3animAir = hum:LoadAnimation(ruler.ClassGui.Ability1AnimFlight)
+cds = {a0 = 0, a1 = 0, a2 = 0, a3 = 0}
+cdt = {a0 = 1.4, a1 = 8, a2 = 10, a3 = 15}
+
+function rc()
+	local tab = {plr.Character}
+	
+	local rp = RaycastParams.new()
+	rp.FilterType = Enum.RaycastFilterType.Blacklist
+	rp.FilterDescendantsInstances = tab
+	
+	while not rac do
+		local ray = workspace:Raycast(plr.Character.HumanoidRootPart.Position, CFrame.new(Vector3.new(0,1,0),Vector3.new(0,0,0)).lookVector * 1000, rp)
+		
+		if ray then
+			if not ray.Instance:FindFirstChild'Terrain' or not ray.Instance.CanCollide then
+				table.insert(tab, ray.Instance)
+				rp.FilterDescendantsInstances = tab
+			else
+				return ray
+			end
+		end
+	end
+end
+
+function hitbox(pos, siz, dmg, effect)
+	spawn(function()
+		local hb = Instance.new("Part", workspace)
+		hb.Transparency = 1
+		hb.Anchored = true
+		hb.CanCollide = false
+		hb.CanTouch = true
+		hb.CFrame = pos
+		hb.Size = siz
+		hb.TopSurface = "Smooth"
+		hb.BottomSurface = "Smooth"
+		hb.BrickColor = BrickColor.new("Bright red")
+		hb.Name = "Hitbox"
+		
+		hb.Touched:Connect(function() end)
+		
+		game:GetService'Debris':AddItem(hb, .5)
+		
+		local hits = {}
+		
+		for i, c in pairs(hb:GetTouchingParts()) do
+			c = c.Parent
+			
+			if c and c:FindFirstChild'Humanoid' and c:FindFirstChild'HumanoidRootPart' and c ~= plr.Character and not hits[c] and c.Stats.CurrentHP.Value > 0 and c.Stats.Safe.Value <= 0 then
+				hits[c] = true
+				
+				if dmg > 0 then
+					game.ReplicatedStorage.Remotes.Damage:InvokeServer(pass(), workspace.RealTime.Value, c, dmg)
+				end
+				
+				effectapply(c, effect, c.Head)
+			end
+		end
+	end)
+end
+
+function cooldown(var, obj, override)
+	spawn(function()
+		cds[var] = override or cdt[var]
+		
+		while cds[var] > 0 do
+			wait(.1)
+			
+			cds[var] -= .1
+			cds[var] = math.floor(cds[var] * 10 + .5) / 10
+			obj.Icon.ImageTransparency = .5
+			obj.CooldownDisplay.Text = cds[var]
+		end
+		
+		cds[var] = 0
+		obj.Icon.ImageTransparency = 0
+		obj.CooldownDisplay.Text = ""
+	end)
+end
+
+function attack0()
+	if cds["a0"] == 0 then
+		if not inAir then
+			cooldown("a0", main.Abilites.Attack)
+			
+			changeSpeed(-12)
+			a0anim:Play()
+			
+			wait(.5)
+			
+			changeSpeed(0)
+			
+			local cf = plr.Character.HumanoidRootPart.CFrame * CFrame.new(0, 2, -6) * CFrame.Angles(math.rad(60), math.rad(math.random(-10, 10)), 0)
+			
+			local rock = destroyer.Projectile.ability2rock1
+			local r = rock:Clone()
+			r.Owner.Value = plr
+			r.Origin.Value = cf.Position
+			r.CFrame = cf
+			r.Color = weaponColor.Value
+			local rph = r.ProjectileHandler
+			rph.Projectile.Value = r
+			rph.Parent = plr.Character
+			
+			r.Parent = workspace
+			
+			projRemote:FireServer(rock, cf, weaponColor.Value)
+			
+			cf = plr.Character.HumanoidRootPart.CFrame * CFrame.new(0, -3, -6)
+			
+			local eff = destroyer.Projectile.ability2b
+			local e = eff:Clone()
+			e.Owner.Value = plr
+			e.Origin.Value = cf.Position
+			e.CFrame = cf
+			e.Color = weaponColor.Value
+			local eph = e.ProjectileHandler
+			eph.Projectile.Value = e
+			eph.Parent = plr.Character
+			
+			e.Parent = workspace
+			
+			projRemote:FireServer(eff, cf, weaponColor.Value)
+			
+			hitbox(cf, Vector3.new(10, 10, 10), 13)
+		else
+			cooldown("a0", main.Abilites.Attack, .1)
+			
+			for i = 1, 5 do
+				local cf = plr.Character.HumanoidRootPart.CFrame * CFrame.Angles(math.rad(-90 + math.random(-10, 10)), math.rad(math.random(-10, 10)), math.rad(math.random(-10, 10))) * CFrame.new(0, 0, -2)
+				
+				local ro = ruler.Projectile.attack
+				local r = ro:Clone()
+				r.Owner.Value = plr
+				r.Origin.Value = cf.Position
+				r.CFrame = cf
+				r.Color = weaponColor.Value
+				r.Damage.Value = -15
+				local rph = r.ProjectileHandler
+				rph.Projectile.Value = r
+				rph.Parent = plr.Character
+				
+				r.Parent = workspace
+				
+				projRemote:FireServer(ro, cf, weaponColor.Value)
+				
+				spawn(function()
+					repeat wait() until r.Transparency == 1
+					
+					for i, c in pairs(workspace:GetChildren()) do
+						if c and c:FindFirstChild'Humanoid' and c:FindFirstChild'HumanoidRootPart' and c ~= plr.Character and c:FindFirstChild'Stats' and c.Stats.CurrentHP.Value > 0 and c.Stats.Safe.Value <= 0 then
+							local dist = (c.HumanoidRootPart.Position - r.Position).Magnitude
+							
+							if dist <= 8 then
+								effectapply(c, game.ReplicatedStorage.Effects.Burn, c.Head)
+							end
+						end
+					end
+				end)
+				
+				wait(.05)
+			end
+		end
+	end
+end
+
+function attack1()
+	if cds["a1"] == 0 then
+		cooldown("a1", main.Abilites.Ability1)
+		
+		changeSpeed(-20)
+		a1anim:Play()
+		
+		wait(.5)
+		
+		for i, c in pairs(workspace:GetChildren()) do
+			if c and c:FindFirstChild'Humanoid' and c:FindFirstChild'HumanoidRootPart' and c ~= plr.Character and c:FindFirstChild'Stats' and c.Stats.CurrentHP.Value > 0 and c.Stats.Safe.Value <= 0 then
+				local dist = (c.HumanoidRootPart.Position - plr.Character.HumanoidRootPart.Position).Magnitude
+				
+				if dist <= 12 then
+					for i = 1, math.ceil(4 - dist / 3) * 2 do
+						effectapply(c, game.ReplicatedStorage.Effects.Burn, c.Head)
+					end
+				end
+			end
+		end
+		
+		for i = -2, 2 do
+			local rac = rc()
+			
+			if rac then
+				local cf = CFrame.new(rac.Position) * plr.Character.HumanoidRootPart.CFrame.Rotation * CFrame.new(i * 2.5, 0, 0) * CFrame.Angles(0, math.rad(i * -15), 0)
+				
+				local eff = destroyer.Projectile.ability1
+				local e = eff:Clone()
+				e.Owner.Value = plr
+				e.Origin.Value = cf.Position
+				e.CFrame = cf
+				e.Damage.Value = 15
+				e.Color = weaponColor.Value
+				local eph = e.ProjectileHandler
+				eph.Projectile.Value = e
+				eph.Parent = plr.Character
+				
+				e.Parent = workspace
+				
+				projRemote:FireServer(eff, cf, weaponColor.Value)
+			end
+		end
+		
+		ab1a:FireServer()
+		local cf = plr.Character.HumanoidRootPart.CFrame
+		
+		local a1a = game.ReplicatedStorage.Classes.RULER.Projectile.ability1a
+		local a1 = a1a:Clone()
+		a1.Owner.Value = plr
+		a1.Origin.Value = cf.Position
+		a1.CFrame = cf
+		a1.Color = weaponColor.Value
+		local aph = a1.ProjectileHandler
+		aph.Projectile.Value = a1
+		aph.Parent = plr.Character
+		
+		a1.Parent = workspace
+		
+		projRemote:FireServer(a1a, cf, weaponColor.Value)
+		
+		changeSpeed(0)
+		
+		local bv = Instance.new("BodyVelocity", plr.Character.HumanoidRootPart)
+		bv.MaxForce = Vector3.new(1, 1, 1) * 1000000
+		bv.Velocity = plr.Character.HumanoidRootPart.CFrame.lookVector * 75 + Vector3.new(0, 50, 0)
+		bv.Name = "RulerRework"
+		local bvv = Instance.new("BoolValue", bv)
+		bvv.Name = "FreeBounce"
+		
+		local eCD
+		
+		delay(.2, function()
+			bv.MaxForce *= Vector3.new(0, 1, 0)
+			
+			inAir = true
+			cds["a0"] = 0
+			eCD = cds["a2"] - 1.8
+			cds["a2"] = 0
+		end)
+		
+		local val = Instance.new("NumberValue")
+		val.Value = 75
+		
+		delay(1, function()
+			val:Destroy()
+			val = nil
+		end)
+		
+		game:GetService'TweenService':Create(val, TweenInfo.new(1), {Value = 5}):Play()
+		
+		spawn(function()
+			while val do
+				bv.Velocity = bv.Velocity * Vector3.new(1, 0, 1) + Vector3.new(0, val.Value, 0)
+				
+				game:GetService'RunService'.Heartbeat:Wait()
+			end
+		end)
+		
+		wait(3)
+		
+		if eCD > 0 then cooldown("a2", main.Abilites.Ability2, eCD) end
+		inAir = false
+		
+		ab1b:FireServer()
+		
+		if bv.Parent then
+			local cf = plr.Character.HumanoidRootPart.CFrame
+			
+			local a1b = game.ReplicatedStorage.Classes.RULER.Projectile.ability1b
+			local a2 = a1b:Clone()
+			a2.Owner.Value = plr
+			a2.Origin.Value = cf.Position
+			a2.CFrame = cf
+			a2.Color = weaponColor.Value
+			local aph2 = a2.ProjectileHandler
+			aph2.Projectile.Value = a2
+			aph2.Parent = plr.Character
+			
+			a2.Parent = workspace
+			
+			projRemote:FireServer(a1b, cf, weaponColor.Value)
+			
+			bv:Destroy()
+		end
+	end
+end
+
+function attack2()
+	if cds["a2"] == 0 then
+		if not inAir then
+			cooldown("a2", main.Abilites.Ability2)
+			
+			local amt = 5
+			
+			for x = 1, amt do
+				local cf = plr.Character.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(x * 360 / amt), 0)
+				
+				local sh = ruler.Projectile.ability2
+				local s = sh:Clone()
+				s.Owner.Value = plr
+				s.Origin.Value = cf.Position
+				s.CFrame = cf
+				s.Color = weaponColor.Value
+				local sph = s.ProjectileHandler
+				sph.Projectile.Value = s
+				sph.Parent = plr.Character
+				
+				s.Parent = workspace
+				
+				projRemote:FireServer(sh, cf, weaponColor.Value)
+				
+				local waitTime = .125
+				
+				spawn(function()
+					wait(x / amt * waitTime)
+					
+					local num = 0
+					
+					while s.Parent do
+						local cf2 = CFrame.new(plr.Character.HumanoidRootPart.Position) * cf.Rotation * CFrame.Angles(0, math.rad(num * 90), 0) * CFrame.new(0, 0, -10)
+						
+						local ro = ruler.Projectile.attack
+						local r = ro:Clone()
+						r.Owner.Value = plr
+						r.Origin.Value = cf2.Position
+						r.CFrame = cf2
+						r.Color = weaponColor.Value
+						r.Damage.Value = 0
+						local rph = r.ProjectileHandler
+						rph.Projectile.Value = r
+						rph.Parent = plr.Character
+						
+						r.Parent = workspace
+						
+						projRemote:FireServer(ro, cf2, weaponColor.Value)
+						
+						num += waitTime
+						wait(waitTime)
+					end
+				end)
+			end
+		else
+			cooldown("a2", main.Abilites.Ability2, .5)
+			
+			a2animAir:Play()
+			a2:FireServer()
+			
+			local rr = plr.Character.HumanoidRootPart:FindFirstChild'RulerRework'
+			local md = plr.Character.Humanoid.MoveDirection
+			
+			if rr then
+				rr.MaxForce = Vector3.new(1, 1, 1) * 1000000
+				rr.Velocity = (md * Vector3.new(1, 0, 1)).Unit * 85 + Vector3.new(0, rr.Velocity.Y, 0)
+				
+				delay(.2, function()
+					if rr then rr.MaxForce *= Vector3.new(0, 1, 0) end
+				end)
+			end
+			
+			for i = 1, 3 do
+				local be = ruler.Projectile.ability2flight1
+				
+				local cf = CFrame.new(plr.Character.HumanoidRootPart.Position, plr.Character.HumanoidRootPart.Position + md) * CFrame.new(0, -be.Size.Y / 2 - 3, -4)
+				
+				local b = be:Clone()
+				b.Owner.Value = plr
+				b.Origin.Value = cf.Position
+				b.CFrame = cf
+				b.Color = weaponColor.Value
+				local bph = b.ProjectileHandler
+				bph.Projectile.Value = b
+				bph.Parent = plr.Character
+				
+				hitbox(b.CFrame, b.Size, 5)
+				
+				b.Parent = workspace
+				
+				projRemote:FireServer(be, cf, weaponColor.Value)
+				
+				wait(.05)
+			end
+		end
+	end
+end
+
+function attack3()
+	if cds["a3"] == 0 then
+		a3animAir:Play()
+		
+		local dmg = 35
+		
+		if not inAir then
+			cooldown("a3", main.Abilites.Critical)
+			
+			local bv = Instance.new("BodyVelocity", plr.Character.HumanoidRootPart)
+			bv.MaxForce = Vector3.new(1, 1, 1) * 1000000
+			bv.Velocity = Vector3.new(0, 100, 0)
+			local bvv = Instance.new("BoolValue", bv)
+			bvv.Name = "FreeBounce"
+			
+			game:GetService'TweenService':Create(bv, TweenInfo.new(1), {Velocity = Vector3.new(0, 0, 0)}):Play()
+			
+			ab1a:FireServer()
+			local cf = plr.Character.HumanoidRootPart.CFrame
+			
+			local a1a = game.ReplicatedStorage.Classes.RULER.Projectile.ability1a
+			local a1 = a1a:Clone()
+			a1.Owner.Value = plr
+			a1.Origin.Value = cf.Position
+			a1.CFrame = cf
+			a1.Color = weaponColor.Value
+			local aph = a1.ProjectileHandler
+			aph.Projectile.Value = a1
+			aph.Parent = plr.Character
+			
+			a1.Parent = workspace
+			
+			projRemote:FireServer(a1a, cf, weaponColor.Value)
+			
+			a2animAir:Play()
+			
+			hitbox(plr.Character.HumanoidRootPart.CFrame, Vector3.new(16, 16, 16), 0, game.ReplicatedStorage.Classes.BOMBER.Effects.Stun)
+			
+			wait(1)
+			
+			bv:Destroy()
+		else
+			local rr = plr.Character.HumanoidRootPart:FindFirstChild'RulerRework'
+			local rrc = rr:Clone()
+			rr:Destroy()
+			rrc.Parent = plr.Character.HumanoidRootPart
+			rr = rrc
+			rr.Name = "RulerReworkStill"
+			
+			rr.Velocity *= Vector3.new(0, 1, 0)
+			rr.MaxForce = Vector3.new(1, 1, 1) * 1000000
+			
+			cooldown("a3", main.Abilites.Critical, 10)
+			
+			dmg = 40
+			
+			wait(1)
+			
+			rr:Destroy()
+		end
+		
+		local rac = rc()
+		
+		ab1b:FireServer()
+		local cf = plr.Character.HumanoidRootPart.CFrame
+		
+		local a1b = game.ReplicatedStorage.Classes.RULER.Projectile.ability1b
+		local a2 = a1b:Clone()
+		a2.Owner.Value = plr
+		a2.Origin.Value = cf.Position
+		a2.CFrame = cf
+		a2.Color = weaponColor.Value
+		local aph2 = a2.ProjectileHandler
+		aph2.Projectile.Value = a2
+		aph2.Parent = plr.Character
+		
+		a2.Parent = workspace
+		
+		projRemote:FireServer(a1b, cf, weaponColor.Value)
+		
+		if rac then
+			inAir = false
+			
+			plr.Character.HumanoidRootPart.CFrame = CFrame.new(rac.Position + Vector3.new(0, 3, 0)) * plr.Character.HumanoidRootPart.CFrame.Rotation
+			
+			function ground(cf2)
+				local a3 = game.ReplicatedStorage.Classes.RULER.Projectile.ability1flight
+				local a = a3:Clone()
+				a.Owner.Value = plr
+				a.Origin.Value = cf2.Position
+				a.CFrame = cf2
+				a.Color = weaponColor.Value
+				local aph3 = a.ProjectileHandler
+				aph3.Projectile.Value = a
+				aph3.Parent = plr.Character
+				
+				a.Parent = workspace
+				
+				projRemote:FireServer(a3, cf2, weaponColor.Value)
+				
+				hitbox(a.CFrame, a.Size, dmg, game.ReplicatedStorage.Classes.KNIGHT.Effects.Stagger)
+			end
+			
+			local cf3 = CFrame.new(rac.Position) * plr.Character.HumanoidRootPart.CFrame.Rotation
+			
+			ground(cf3)
+		end
+	end
+end
+
+function reqs(funct)
+	if plr.Character.Stats.Disable.Value ~= 0 then return end
+	if plr.Character.Stats.CurrentHP.Value <= 0 then return end
+	if not plr.PlayerGui:FindFirstChild'ClassGui' then return end
+	if plr.PlayerGui.ClassGui ~= ui then return end
+	
+	funct()
+end
+
+game.Players.LocalPlayer:GetMouse().Button1Down:Connect(function()
+	reqs(attack0)
+end)
+
+game:GetService'UserInputService'.InputBegan:Connect(function(key, typ)
+	if typ then return end
+	
+	if key.KeyCode == Enum.KeyCode.Q then
+		reqs(attack1)
+	end
+	if key.KeyCode == Enum.KeyCode.E then
+		reqs(attack2)
+	end
+	if key.KeyCode == Enum.KeyCode.F then
+		reqs(attack3)
+	end
+end)
+
+main:WaitForChild'Abilites':WaitForChild'Attack'.MouseButton1Click:Connect(function() reqs(attack0) end)
+main:WaitForChild'Abilites':WaitForChild'Ability1'.MouseButton1Click:Connect(function() reqs(attack1) end)
+main:WaitForChild'Abilites':WaitForChild'Ability2'.MouseButton1Click:Connect(function() reqs(attack2) end)
+main:WaitForChild'Abilites':WaitForChild'Critical'.MouseButton1Click:Connect(function() reqs(attack3) end)
+
+repeat wait() until plr.Character:FindFirstChild'Extra'
+
+createnewjetmodel()
+
+local originalInfo = {}
+local newInfo = {
+	CName = "RULER (REWORK)",
+	Attack = "Move0NameG / Blazing Zero - NIL / Rains down several blazing missiles, dealing low damage and burn",
+	Ability1 = "Move1Name - NIL",
+	Ability2 = "Move2NameG / Move2NameA - NIL / NIL",
+	Critical = "deatj - Slams on the ground, stunning and doing medium damage if the player activates on the ground, high damage without stun if the player activates in the air",
+	Credit = "WHOSE IDEA WAS THIS?? oh wait it was mine nvm"
+}
+
+for i, c in pairs(game.ReplicatedStorage.Classes.RULER.ClassInfo:GetChildren()) do
+	originalInfo[c] = c.Value
+	
+	if newInfo[c.Name] then
+		c.Value = newInfo[c.Name]
+	end
+end
+
+repeat game:GetService'RunService'.Heartbeat:Wait() until not ui.Parent
+
+for i, c in pairs(originalInfo) do
+	i.Value = c
+end
