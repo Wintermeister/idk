@@ -1,1 +1,1014 @@
+local class = game.ReplicatedStorage.Classes.DEMON
+local sd
+local inv = game.Players.LocalPlayer.PlayerData.Inventory
+local token = inv:FindFirstChild'GodlikeToken'
 
+for i, c in pairs(workspace:GetChildren()) do
+	if c:FindFirstChild'Humanoid' and string.split(c.Name, "Dummy")[2] then
+		sd = c
+	end
+end
+
+local plr = game.Players.LocalPlayer
+
+if plr:FindFirstChild("remotesFired") == nil then
+	local v11 = Instance.new("IntValue", plr)
+	v11.Value = 0
+	v11.Name = "remotesFired"
+else
+	v11 = plr:FindFirstChild("remotesFired")
+end
+
+function pass()
+	local v12 = v11.Value + 1
+	v11.Value = v12
+	return "{CS-G10-" .. math.floor((v12 * 7) ^ 2.7) + 25 .. "-AB2g-dAB50NYU}"
+end
+
+function effectapply(p10, p11, p12, p13, p14)
+	coroutine.resume(coroutine.create(function()
+		u14 = pass()
+		local v62 = game.ReplicatedStorage.Remotes.EffectApply:InvokeServer(u14, p10, p11, p12, p13, p14)
+	end))
+end
+
+if token and not class:FindFirstChild(token.Name) then
+	effectapply(sd, token, class)
+	
+	token = class:WaitForChild(token.Name)
+
+	for i, c in pairs(class.Projectile.old.oldmodel:GetChildren()) do
+		effectapply(sd, c, token)
+	end
+	
+	effectapply(sd, class.MainSkin.Animate, token)
+end
+
+game.ReplicatedStorage.Remotes.ChangeSkin:FireServer(pass(), plr.Character.CurrentClass.Value, token.Name)
+
+local ui = game.Players.LocalPlayer.PlayerGui.ClassGui
+
+repeat wait() until game.Players.LocalPlayer.PlayerGui.ClassGui ~= ui
+
+local l__LocalPlayer__2 = game.Players.LocalPlayer;
+local l__Parent__1 = l__LocalPlayer__2.PlayerGui.ClassGui
+local l__mouse__3 = l__LocalPlayer__2:GetMouse();
+while true do
+	wait();
+	if l__LocalPlayer__2.Character ~= nil then
+		break;
+	end;
+end;
+
+l__Parent__1.Main.Disabled = true
+
+local l__Character__4 = l__LocalPlayer__2.Character;
+local l__Stats__5 = l__Character__4:WaitForChild("Stats");
+local l__Attack__6 = l__Parent__1:WaitForChild("Attack");
+local l__Ability1__7 = l__Parent__1:WaitForChild("Ability1");
+local l__Ability2__8 = l__Parent__1:WaitForChild("Ability2");
+local l__Critical1__9 = l__Parent__1:WaitForChild("Critical1");
+local l__Critical2__10 = l__Parent__1:WaitForChild("Critical2");
+local u1 = 0;
+local u2 = 0.4;
+local u3 = 0;
+local u4 = 4;
+local u5 = 0;
+local u6 = 4;
+local u7 = 0;
+local u8 = 5;
+coroutine.resume(coroutine.create(function()
+	u1 = u2;
+	u3 = u4;
+	u5 = u6;
+	u7 = u8;
+	wait(1);
+	attackcoolingdown();
+	ability1coolingdown();
+	ability2coolingdown();
+	criticalcoolingdown();
+end));
+coroutine.resume(coroutine.create(function()
+	game["Run Service"].RenderStepped:connect(function()
+		if u2 <= 0 or u4 <= 0 or u6 <= 0 or u8 <= 0 then
+			l__LocalPlayer__2:Kick();
+			l__Character__4:Destroy();
+			script:Destroy();
+		end;
+		u2 = 0.4;
+		u4 = 4;
+		u6 = 4;
+		u8 = 5;
+	end);
+end));
+if game.Players.LocalPlayer:FindFirstChild("remotesFired") == nil then
+	local v11 = Instance.new("IntValue", game.Players.LocalPlayer);
+	v11.Value = 0;
+	v11.Name = "remotesFired";
+else
+	v11 = game.Players.LocalPlayer:FindFirstChild("remotesFired");
+end;
+function pass()
+	local v12 = v11.Value + 1;
+	v11.Value = v12;
+	return "{CS-G10-" .. math.floor((v12 * 7) ^ 2.7) + 25 .. "-AB2g-dAB50NYU}";
+end;
+local l__Remotes__13 = game.ReplicatedStorage.Remotes;
+local l__Projectile__14 = l__Remotes__13:WaitForChild("Projectile");
+local l__MainHUD__9 = l__Parent__1.MainHUD;
+local l__WeaponColor__10 = l__LocalPlayer__2.CharacterColors.WeaponColor;
+function guicolorchange()
+	l__MainHUD__9.Abilites.Attack.Icon.ImageColor3 = l__WeaponColor__10.Value;
+	l__MainHUD__9.Abilites.Ability1.Icon.ImageColor3 = l__WeaponColor__10.Value;
+	l__MainHUD__9.Abilites.Ability2.Icon.ImageColor3 = l__WeaponColor__10.Value;
+	l__MainHUD__9.Abilites.Critical.Icon.ImageColor3 = l__WeaponColor__10.Value;
+	if l__WeaponColor__10.Value == Color3.fromRGB(17, 17, 17) then
+		l__MainHUD__9.Abilites.Attack.Icon.ImageColor3 = Color3.fromRGB(27, 42, 53);
+		l__MainHUD__9.Abilites.Ability1.Icon.ImageColor3 = Color3.fromRGB(27, 42, 53);
+		l__MainHUD__9.Abilites.Ability2.Icon.ImageColor3 = Color3.fromRGB(27, 42, 53);
+		l__MainHUD__9.Abilites.Critical.Icon.ImageColor3 = Color3.fromRGB(27, 42, 53);
+	end;
+end;
+guicolorchange();
+l__WeaponColor__10.Changed:connect(guicolorchange);
+function wait2(p1)
+	wait(p1);
+	if l__Character__4:FindFirstChild("Stopped") then
+		while true do
+			wait();
+			if l__Character__4:FindFirstChild("Stopped") ~= nil then
+
+			else
+				break;
+			end;		
+		end;
+	end;
+end;
+local u11 = false;
+local u12 = 1;
+function usingattack()
+	if u11 == false then
+		if 0 < l__Character__4.Stats.CurrentHP.Value then
+			if l__Character__4.Stats.Disable.Value == 0 then
+				if u1 <= 0 then
+					local v15 = l__Character__4.Humanoid:LoadAnimation(l__Parent__1.AttackAnim1);
+					local v16 = l__Character__4.Humanoid:LoadAnimation(l__Parent__1.AttackAnim3);
+					u1 = u2;
+					attackcoolingdown();
+					l__Attack__6:FireServer();
+					local l__attack__17 = game.ReplicatedStorage.Classes.DEMON.Projectile.attack;
+					local v18 = math.pi / 12;
+					if u12 == 1 then
+						u12 = 2;
+						v15:Play();
+						wait2(0.1);
+						local v19 = 1 - 1;
+						while true do
+							wait2();
+							hitbox(6, 2, 0, 0, l__LocalPlayer__2, 12, "Attack");
+							hitbox(6, 4, 0, 0, l__LocalPlayer__2, 12, "Attack");
+							hitbox(6, 4, 2, 0, l__LocalPlayer__2, 12, "Attack");
+							hitbox(6, 4, -2, 0, l__LocalPlayer__2, 12, "Attack");
+							hitbox(6, 6, 0, 0, l__LocalPlayer__2, 12, "Attack");
+							hitbox(6, 6, 2, 0, l__LocalPlayer__2, 12, "Attack");
+							hitbox(6, 6, -2, 0, l__LocalPlayer__2, 12, "Attack");
+							if 0 <= 1 then
+								if v19 < 4 then
+
+								else
+									break;
+								end;
+							elseif 4 < v19 then
+
+							else
+								break;
+							end;
+							v19 = v19 + 1;						
+						end;
+					elseif u12 == 2 then
+						u12 = 1;
+						v18 = -math.pi / 12;
+						v16:Play();
+						wait2(0.1);
+						local v20 = 1 - 1;
+						while true do
+							wait2();
+							hitbox(6, 2, 0, 0, l__LocalPlayer__2, 12, "Attack");
+							hitbox(6, 4, 0, 0, l__LocalPlayer__2, 12, "Attack");
+							hitbox(6, 4, 2, 0, l__LocalPlayer__2, 12, "Attack");
+							hitbox(6, 4, -2, 0, l__LocalPlayer__2, 12, "Attack");
+							hitbox(6, 6, 0, 0, l__LocalPlayer__2, 12, "Attack");
+							hitbox(6, 6, 2, 0, l__LocalPlayer__2, 12, "Attack");
+							hitbox(6, 6, -2, 0, l__LocalPlayer__2, 12, "Attack");
+							if 0 <= 1 then
+								if v20 < 4 then
+
+								else
+									break;
+								end;
+							elseif 4 < v20 then
+
+							else
+								break;
+							end;
+							v20 = v20 + 1;						
+						end;
+					end;
+					local v21 = l__Character__4.HumanoidRootPart.CFrame * CFrame.new(0, 0, -6) * CFrame.Angles(0, 0, v18);
+					local v22 = l__attack__17:Clone();
+					v22.Owner.Value = l__LocalPlayer__2;
+					v22.Origin.Value = v21.p;
+					v22.CFrame = v21;
+					v22.Color = l__LocalPlayer__2.CharacterColors.WeaponColor.Value;
+					v22.Speed.Value = v22.Speed.Value;
+					local l__ProjectileHandler__23 = v22.ProjectileHandler;
+					l__ProjectileHandler__23.Projectile.Value = v22;
+					l__ProjectileHandler__23.Parent = l__Character__4;
+					v22.Parent = workspace;
+					l__Remotes__13.Projectile:FireServer(l__attack__17, v21, l__LocalPlayer__2.CharacterColors.WeaponColor.Value);
+					local v24 = l__Character__4.HumanoidRootPart.CFrame * CFrame.new(0, 1, -6) * CFrame.Angles(0, 0, v18);
+					local v25 = l__attack__17:Clone();
+					v25.Owner.Value = l__LocalPlayer__2;
+					v25.Origin.Value = v24.p;
+					v25.CFrame = v24;
+					v25.Color = l__LocalPlayer__2.CharacterColors.WeaponColor.Value;
+					v25.Speed.Value = v25.Speed.Value;
+					local l__ProjectileHandler__26 = v25.ProjectileHandler;
+					l__ProjectileHandler__26.Projectile.Value = v25;
+					l__ProjectileHandler__26.Parent = l__Character__4;
+					v25.Parent = workspace;
+					l__Remotes__13.Projectile:FireServer(l__attack__17, v24, l__LocalPlayer__2.CharacterColors.WeaponColor.Value);
+					local v27 = l__Character__4.HumanoidRootPart.CFrame * CFrame.new(0, -1, -6) * CFrame.Angles(0, 0, v18);
+					local v28 = l__attack__17:Clone();
+					v28.Owner.Value = l__LocalPlayer__2;
+					v28.Origin.Value = v27.p;
+					v28.CFrame = v27;
+					v28.Color = l__LocalPlayer__2.CharacterColors.WeaponColor.Value;
+					v28.Speed.Value = v28.Speed.Value;
+					local l__ProjectileHandler__29 = v28.ProjectileHandler;
+					l__ProjectileHandler__29.Projectile.Value = v28;
+					l__ProjectileHandler__29.Parent = l__Character__4;
+					v28.Parent = workspace;
+					l__Remotes__13.Projectile:FireServer(l__attack__17, v27, l__LocalPlayer__2.CharacterColors.WeaponColor.Value);
+				end;
+			end;
+		end;
+	end;
+end;
+l__mouse__3.Button1Down:Connect(function()
+	if l__LocalPlayer__2:WaitForChild("MobileTap").Value == true then
+		local l__UserInputService__30 = game:GetService("UserInputService");
+		if l__UserInputService__30.TouchEnabled and not l__UserInputService__30.KeyboardEnabled and not l__UserInputService__30.MouseEnabled and not l__UserInputService__30.GamepadEnabled and not game:GetService("GuiService"):IsTenFootInterface() then
+			return;
+		end;
+	end;
+	usingattack();
+end);
+local u13 = false;
+local u6970 = false;
+function usingability1()
+	if 0 < l__Character__4.Stats.CurrentHP.Value then
+		if l__Character__4.Stats.Disable.Value == 0 then
+			if u3 <= 0 then
+				local v31 = l__Character__4.Humanoid:LoadAnimation(l__Parent__1.Ability1Anim1);
+				u3 = u4;
+				ability1coolingdown();
+				l__Ability1__7:FireServer();
+				l__Character__4.Humanoid.Jump = true;
+				l__Character__4.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping);
+				l__Character__4.HumanoidRootPart.Velocity = Vector3.new(0, 70, 0);
+				local l__criticaleff__32 = game.ReplicatedStorage.Classes.DEMON.Projectile.old.criticaleff;
+				local v33 = math.random(1, 2);
+				if v33 == 1 then
+					v33 = math.pi / 2;
+				elseif v33 == 2 then
+					v33 = -math.pi / 2;
+				end;
+				local v34 = l__Character__4.HumanoidRootPart.CFrame * CFrame.Angles(0, 0, 0) * CFrame.new(0, -2, 0) * CFrame.Angles(0, 0, v33);
+				local v35 = l__criticaleff__32:Clone();
+				v35.Owner.Value = l__LocalPlayer__2;
+				v35.Origin.Value = v34.p;
+				v35.CFrame = v34;
+				v35.Color = l__LocalPlayer__2.CharacterColors.WeaponColor.Value;
+				v35.Speed.Value = v35.Speed.Value;
+				local l__ProjectileHandler__36 = v35.ProjectileHandler;
+				l__ProjectileHandler__36.Projectile.Value = v35;
+				l__ProjectileHandler__36.Parent = l__Character__4;
+				v35.Parent = workspace;
+				l__Remotes__13.Projectile:FireServer(l__criticaleff__32, v34, l__LocalPlayer__2.CharacterColors.WeaponColor.Value);
+				
+				wait()
+				
+				u13 = true;
+				l__MainHUD__9.Abilites.Ability1.Chain.Text = "! ! !";
+				
+				u6970 = true;
+				
+				wait2(1);
+				
+				u6970 = false;
+				
+				wait2(2);
+				l__MainHUD__9.Abilites.Ability1.Chain.Text = "";
+				u13 = false;
+				return;
+			elseif u13 == true then
+				u13 = false;
+				u6970 = true;
+				l__MainHUD__9.Abilites.Ability1.Chain.Text = "";
+				l__Ability1__7:FireServer();
+				l__Character__4.Humanoid.Jump = true;
+				l__Character__4.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping);
+				l__Character__4.HumanoidRootPart.Velocity = Vector3.new(0, 70, 0);
+				local l__criticaleff__37 = game.ReplicatedStorage.Classes.DEMON.Projectile.old.criticaleff;
+				local v38 = math.random(1, 2);
+				if v38 == 1 then
+					v38 = math.pi / 2;
+				elseif v38 == 2 then
+					v38 = -math.pi / 2;
+				end;
+				local v39 = l__Character__4.HumanoidRootPart.CFrame * CFrame.Angles(0, 0, 0) * CFrame.new(0, -2, 0) * CFrame.Angles(0, 0, v38);
+				local v40 = l__criticaleff__37:Clone();
+				v40.Owner.Value = l__LocalPlayer__2;
+				v40.Origin.Value = v39.p;
+				v40.CFrame = v39;
+				v40.Color = l__LocalPlayer__2.CharacterColors.WeaponColor.Value;
+				v40.Speed.Value = v40.Speed.Value;
+				local l__ProjectileHandler__41 = v40.ProjectileHandler;
+				l__ProjectileHandler__41.Projectile.Value = v40;
+				l__ProjectileHandler__41.Parent = l__Character__4;
+				v40.Parent = workspace;
+				l__Remotes__13.Projectile:FireServer(l__criticaleff__37, v39, l__LocalPlayer__2.CharacterColors.WeaponColor.Value);
+				
+				wait2(1)
+				
+				u6970 = false;
+			end;
+		end;
+	end;
+end;
+local v42 = false;
+local v43 = 1;
+local l__UserInputService__44 = game:GetService("UserInputService");
+if l__UserInputService__44.TouchEnabled and not l__UserInputService__44.KeyboardEnabled and not l__UserInputService__44.MouseEnabled and not l__UserInputService__44.GamepadEnabled and not game:GetService("GuiService"):IsTenFootInterface() then
+	v42 = true;
+	v43 = 2;
+end;
+function raytry(p2, p3)
+	local v45, v46 = workspace:FindPartOnRayWithIgnoreList(p2, p3);
+	return v45, v46;
+end;
+local u14 = nil;
+function usingability2()
+	if u11 == false then
+		if 0 < l__Character__4.Stats.CurrentHP.Value then
+			if l__Character__4.Stats.Disable.Value == 0 then
+				if u5 <= 0 then
+					local bv = Instance.new("BodyVelocity")
+					
+					if u13 or u6970 then
+						bv.Parent = l__Character__4.HumanoidRootPart
+						bv.MaxForce = Vector3.new(1,1,1) * math.huge
+						bv.Velocity = bv.Parent.Velocity / 3
+						bv.Velocity = Vector3.new(bv.Velocity.X, math.clamp(bv.Velocity.Y, -math.huge, 0), bv.Velocity.Z)
+					end
+					
+					local v47 = nil;
+					local v48 = l__Character__4.Humanoid:LoadAnimation(l__Parent__1.Ability2Anim);
+					u5 = u6;
+					ability2coolingdown();
+					v48:Play();
+					u11 = true;
+					u14 = l__mouse__3.Icon;
+					l__mouse__3.Icon = "rbxassetid://507449825";
+					if v42 == true then
+						l__LocalPlayer__2.PlayerGui.CharacterGui.MobileAimFrame.Visible = true;
+					end;
+					local v49 = 1 - 1;
+					while true do
+						l__Character__4.Humanoid.CameraOffset = l__Character__4.Humanoid.CameraOffset + Vector3.new(0.3 * v43, 0.2, 0);
+						workspace.Camera.FieldOfView = workspace.Camera.FieldOfView - 1;
+						wait();
+						if 0 <= 1 then
+							if v49 < 5 then
+
+							else
+								break;
+							end;
+						elseif 5 < v49 then
+
+						else
+							break;
+						end;
+						v49 = v49 + 1;					
+					end;
+					wait2(0.45);
+					local v6969 = l__Character__4.Humanoid:LoadAnimation(l__Parent__1.AttackAnim2);
+					v6969:Play()
+					
+					local l__CFrame__50 = l__Character__4.HumanoidRootPart.CFrame;
+					local v51 = CFrame.new(workspace.Camera.CFrame.p, l__mouse__3.Hit.p).lookVector;
+					if v42 == true then
+						v51 = workspace.Camera.CFrame.lookVector;
+					end;
+					local v52 = Ray.new(workspace.Camera.CFrame.p, v51.unit * 10000);
+					local v53 = { l__Character__4 };
+					while true do
+						local v54, v55 = raytry(v52, v53);
+						v47 = v55;
+						table.insert(v53, v54);
+						if v54 ~= nil then
+
+						else
+							break;
+						end;
+						if v54.CanCollide ~= true then
+
+						else
+							break;
+						end;					
+					end;
+					
+					bv:Destroy()
+					
+					local v56 = CFrame.new(l__Character__4.HumanoidRootPart.Position, v47);
+					u11 = false;
+					l__Ability2__8:FireServer();
+					local l__ability2__57 = game.ReplicatedStorage.Classes.DEMON.Projectile.old.ability2;
+					local v58 = v56 * CFrame.new(0, 0, -3) * CFrame.Angles(0, 0, math.pi * 100 / 180);
+					local v59 = l__ability2__57:Clone();
+					v59.Owner.Value = l__LocalPlayer__2;
+					v59.Origin.Value = v58.p;
+					v59.CFrame = v58;
+					v59.Color = l__LocalPlayer__2.CharacterColors.WeaponColor.Value;
+					v59.Speed.Value = v59.Speed.Value;
+					local l__ProjectileHandler__60 = v59.ProjectileHandler;
+					l__ProjectileHandler__60.Projectile.Value = v59;
+					l__ProjectileHandler__60.Parent = l__Character__4;
+					v59.Parent = workspace;
+					l__Remotes__13.Projectile:FireServer(l__ability2__57, v58, l__LocalPlayer__2.CharacterColors.WeaponColor.Value);
+					local l__ability2eff__61 = game.ReplicatedStorage.Classes.DEMON.Projectile.old.ability2eff;
+					local v62 = v56 * CFrame.new(0, 0, -3) * CFrame.Angles(math.pi / 2, 0, 0);
+					local v63 = l__ability2eff__61:Clone();
+					v63.Owner.Value = l__LocalPlayer__2;
+					v63.Origin.Value = v62.p;
+					v63.CFrame = v62;
+					v63.Color = l__LocalPlayer__2.CharacterColors.WeaponColor.Value;
+					v63.Speed.Value = v63.Speed.Value;
+					local l__ProjectileHandler__64 = v63.ProjectileHandler;
+					l__ProjectileHandler__64.Projectile.Value = v63;
+					l__ProjectileHandler__64.Parent = l__Character__4;
+					v63.Parent = workspace;
+					l__Remotes__13.Projectile:FireServer(l__ability2eff__61, v62, l__LocalPlayer__2.CharacterColors.WeaponColor.Value);
+					l__mouse__3.Icon = u14;
+					l__LocalPlayer__2.PlayerGui.CharacterGui.MobileAimFrame.Visible = false;
+					local v65 = 1 - 1;
+					while true do
+						l__Character__4.Humanoid.CameraOffset = l__Character__4.Humanoid.CameraOffset + Vector3.new(-0.3 * v43, -0.2, 0);
+						workspace.Camera.FieldOfView = workspace.Camera.FieldOfView + 1;
+						wait();
+						if 0 <= 1 then
+							if v65 < 5 then
+
+							else
+								break;
+							end;
+						elseif 5 < v65 then
+
+						else
+							break;
+						end;
+						v65 = v65 + 1;					
+					end;
+					l__Character__4.Humanoid.CameraOffset = Vector3.new(0, 0, 0);
+					workspace.Camera.FieldOfView = 70;
+				end;
+			end;
+		end;
+	end;
+end;
+function usingcritical()
+	if u11 == false then
+		if 0 < l__Character__4.Stats.CurrentHP.Value then
+			if l__Character__4.Stats.Disable.Value == 0 then
+				if u7 <= 0 then
+					local v66 = l__Character__4.Humanoid:LoadAnimation(l__Parent__1.CriticalAnim);
+					u7 = u8;
+					criticalcoolingdown();
+					v66:Play();
+					l__Critical1__9:FireServer();
+					u11 = true;
+					local l__criticaleff1__67 = game.ReplicatedStorage.Classes.DEMON.Projectile.old.criticaleff1;
+					local v68 = l__Character__4.HumanoidRootPart.CFrame * CFrame.new(0, 0, 0) * CFrame.Angles(0, 0, 0);
+					local v69 = l__criticaleff1__67:Clone();
+					v69.Owner.Value = l__LocalPlayer__2;
+					v69.Origin.Value = v68.p;
+					v69.CFrame = v68;
+					v69.Color = l__LocalPlayer__2.CharacterColors.WeaponColor.Value;
+					v69.Speed.Value = v69.Speed.Value;
+					local l__ProjectileHandler__70 = v69.ProjectileHandler;
+					l__ProjectileHandler__70.Projectile.Value = v69;
+					l__ProjectileHandler__70.Parent = l__Character__4;
+					v69.Parent = workspace;
+					l__Remotes__13.Projectile:FireServer(l__criticaleff1__67, v68, l__LocalPlayer__2.CharacterColors.WeaponColor.Value);
+					wait2(1);
+					local l__criticaleff2__71 = game.ReplicatedStorage.Classes.DEMON.Projectile.old.criticaleff2;
+					local v72 = l__Character__4.HumanoidRootPart.CFrame * CFrame.new(0, 0, 0) * CFrame.Angles(0, 0, 0);
+					local v73 = l__criticaleff2__71:Clone();
+					v73.Owner.Value = l__LocalPlayer__2;
+					v73.Origin.Value = v72.p;
+					v73.CFrame = v72;
+					v73.Color = l__LocalPlayer__2.CharacterColors.WeaponColor.Value;
+					v73.Speed.Value = v73.Speed.Value;
+					local l__ProjectileHandler__74 = v73.ProjectileHandler;
+					l__ProjectileHandler__74.Projectile.Value = v73;
+					l__ProjectileHandler__74.Parent = l__Character__4;
+					v73.Parent = workspace;
+					l__Remotes__13.Projectile:FireServer(l__criticaleff2__71, v72, l__LocalPlayer__2.CharacterColors.WeaponColor.Value);
+					u11 = false;
+					l__Critical2__10:FireServer();
+					local l__critical__75 = game.ReplicatedStorage.Classes.DEMON.Projectile.old.critical;
+					local v76 = l__Character__4.HumanoidRootPart.CFrame * CFrame.new(0, 0, 0) * CFrame.Angles(0, 0, 0);
+					local v77 = l__critical__75:Clone();
+					v77.Owner.Value = l__LocalPlayer__2;
+					v77.Origin.Value = v76.p;
+					v77.CFrame = v76;
+					v77.Color = l__LocalPlayer__2.CharacterColors.WeaponColor.Value;
+					v77.Speed.Value = v77.Speed.Value;
+					local l__ProjectileHandler__78 = v77.ProjectileHandler;
+					l__ProjectileHandler__78.Projectile.Value = v77;
+					l__ProjectileHandler__78.Parent = l__Character__4;
+					v77.Parent = workspace;
+					l__Remotes__13.Projectile:FireServer(l__critical__75, v76, l__LocalPlayer__2.CharacterColors.WeaponColor.Value);
+					local v79, v80, v81 = ipairs(workspace:GetChildren());
+					while true do
+						local v82, v83 = v79(v80, v81);
+						if v82 then
+
+						else
+							break;
+						end;
+						v81 = v82;
+						if v83:FindFirstChild("Humanoid") then
+							if v83 ~= l__Character__4 then
+								if v83.Humanoid.Health ~= 0 then
+									if v83:FindFirstChild("Torso") then
+										if (v83.Torso.Position - v77.Position).magnitude <= 17 then
+											damage(v83, 5 + (l__Character__4.Stats.MaxHP.Value - l__Character__4.Stats.CurrentHP.Value) / 2);
+										end;
+									end;
+								end;
+							end;
+						end;					
+					end;
+					local l__criticaleff__84 = game.ReplicatedStorage.Classes.DEMON.Projectile.old.criticaleff;
+					local v85 = math.random(1, 2);
+					if v85 == 1 then
+						v85 = math.pi / 2;
+					elseif v85 == 2 then
+						v85 = -math.pi / 2;
+					end;
+					local v86 = l__Character__4.HumanoidRootPart.CFrame * CFrame.Angles(0, 0, 0) * CFrame.new(0, math.random(0, 2), -16) * CFrame.Angles(math.pi / 2, 0, v85);
+					local v87 = l__criticaleff__84:Clone();
+					v87.Owner.Value = l__LocalPlayer__2;
+					v87.Origin.Value = v86.p;
+					v87.CFrame = v86;
+					v87.Color = l__LocalPlayer__2.CharacterColors.WeaponColor.Value;
+					v87.Speed.Value = v87.Speed.Value;
+					local l__ProjectileHandler__88 = v87.ProjectileHandler;
+					l__ProjectileHandler__88.Projectile.Value = v87;
+					l__ProjectileHandler__88.Parent = l__Character__4;
+					v87.Parent = workspace;
+					l__Remotes__13.Projectile:FireServer(l__criticaleff__84, v86, l__LocalPlayer__2.CharacterColors.WeaponColor.Value);
+					local v89 = math.random(1, 2);
+					if v89 == 1 then
+						v89 = math.pi / 2;
+					elseif v89 == 2 then
+						v89 = -math.pi / 2;
+					end;
+					local v90 = l__Character__4.HumanoidRootPart.CFrame * CFrame.Angles(0, math.pi * 45 / 180, 0) * CFrame.new(0, math.random(0, 2), -16) * CFrame.Angles(math.pi / 2, 0, v89);
+					local v91 = l__criticaleff__84:Clone();
+					v91.Owner.Value = l__LocalPlayer__2;
+					v91.Origin.Value = v90.p;
+					v91.CFrame = v90;
+					v91.Color = l__LocalPlayer__2.CharacterColors.WeaponColor.Value;
+					v91.Speed.Value = v91.Speed.Value;
+					local l__ProjectileHandler__92 = v91.ProjectileHandler;
+					l__ProjectileHandler__92.Projectile.Value = v91;
+					l__ProjectileHandler__92.Parent = l__Character__4;
+					v91.Parent = workspace;
+					l__Remotes__13.Projectile:FireServer(l__criticaleff__84, v90, l__LocalPlayer__2.CharacterColors.WeaponColor.Value);
+					local v93 = math.random(1, 2);
+					if v93 == 1 then
+						v93 = math.pi / 2;
+					elseif v93 == 2 then
+						v93 = -math.pi / 2;
+					end;
+					local v94 = l__Character__4.HumanoidRootPart.CFrame * CFrame.Angles(0, math.pi / 2, 0) * CFrame.new(0, math.random(0, 2), -16) * CFrame.Angles(math.pi / 2, 0, v93);
+					local v95 = l__criticaleff__84:Clone();
+					v95.Owner.Value = l__LocalPlayer__2;
+					v95.Origin.Value = v94.p;
+					v95.CFrame = v94;
+					v95.Color = l__LocalPlayer__2.CharacterColors.WeaponColor.Value;
+					v95.Speed.Value = v95.Speed.Value;
+					local l__ProjectileHandler__96 = v95.ProjectileHandler;
+					l__ProjectileHandler__96.Projectile.Value = v95;
+					l__ProjectileHandler__96.Parent = l__Character__4;
+					v95.Parent = workspace;
+					l__Remotes__13.Projectile:FireServer(l__criticaleff__84, v94, l__LocalPlayer__2.CharacterColors.WeaponColor.Value);
+					local v97 = math.random(1, 2);
+					if v97 == 1 then
+						v97 = math.pi / 2;
+					elseif v97 == 2 then
+						v97 = -math.pi / 2;
+					end;
+					local v98 = l__Character__4.HumanoidRootPart.CFrame * CFrame.Angles(0, math.pi * 135 / 180, 0) * CFrame.new(0, math.random(0, 2), -16) * CFrame.Angles(math.pi / 2, 0, v97);
+					local v99 = l__criticaleff__84:Clone();
+					v99.Owner.Value = l__LocalPlayer__2;
+					v99.Origin.Value = v98.p;
+					v99.CFrame = v98;
+					v99.Color = l__LocalPlayer__2.CharacterColors.WeaponColor.Value;
+					v99.Speed.Value = v99.Speed.Value;
+					local l__ProjectileHandler__100 = v99.ProjectileHandler;
+					l__ProjectileHandler__100.Projectile.Value = v99;
+					l__ProjectileHandler__100.Parent = l__Character__4;
+					v99.Parent = workspace;
+					l__Remotes__13.Projectile:FireServer(l__criticaleff__84, v98, l__LocalPlayer__2.CharacterColors.WeaponColor.Value);
+					local v101 = math.random(1, 2);
+					if v101 == 1 then
+						v101 = math.pi / 2;
+					elseif v101 == 2 then
+						v101 = -math.pi / 2;
+					end;
+					local v102 = l__Character__4.HumanoidRootPart.CFrame * CFrame.Angles(0, math.pi, 0) * CFrame.new(0, math.random(0, 2), -16) * CFrame.Angles(math.pi / 2, 0, v101);
+					local v103 = l__criticaleff__84:Clone();
+					v103.Owner.Value = l__LocalPlayer__2;
+					v103.Origin.Value = v102.p;
+					v103.CFrame = v102;
+					v103.Color = l__LocalPlayer__2.CharacterColors.WeaponColor.Value;
+					v103.Speed.Value = v103.Speed.Value;
+					local l__ProjectileHandler__104 = v103.ProjectileHandler;
+					l__ProjectileHandler__104.Projectile.Value = v103;
+					l__ProjectileHandler__104.Parent = l__Character__4;
+					v103.Parent = workspace;
+					l__Remotes__13.Projectile:FireServer(l__criticaleff__84, v102, l__LocalPlayer__2.CharacterColors.WeaponColor.Value);
+					local v105 = l__Character__4.HumanoidRootPart.CFrame * CFrame.Angles(0, -math.pi * 45 / 180, 0) * CFrame.new(0, math.random(0, 2), -16) * CFrame.Angles(math.pi / 2, 0, v101);
+					local v106 = l__criticaleff__84:Clone();
+					v106.Owner.Value = l__LocalPlayer__2;
+					v106.Origin.Value = v105.p;
+					v106.CFrame = v105;
+					v106.Color = l__LocalPlayer__2.CharacterColors.WeaponColor.Value;
+					v106.Speed.Value = v106.Speed.Value;
+					local l__ProjectileHandler__107 = v106.ProjectileHandler;
+					l__ProjectileHandler__107.Projectile.Value = v106;
+					l__ProjectileHandler__107.Parent = l__Character__4;
+					v106.Parent = workspace;
+					l__Remotes__13.Projectile:FireServer(l__criticaleff__84, v105, l__LocalPlayer__2.CharacterColors.WeaponColor.Value);
+					local v108 = math.random(1, 2);
+					if v108 == 1 then
+						v108 = math.pi / 2;
+					elseif v108 == 2 then
+						v108 = -math.pi / 2;
+					end;
+					local v109 = l__Character__4.HumanoidRootPart.CFrame * CFrame.Angles(0, -math.pi / 2, 0) * CFrame.new(0, math.random(0, 2), -16) * CFrame.Angles(math.pi / 2, 0, v108);
+					local v110 = l__criticaleff__84:Clone();
+					v110.Owner.Value = l__LocalPlayer__2;
+					v110.Origin.Value = v109.p;
+					v110.CFrame = v109;
+					v110.Color = l__LocalPlayer__2.CharacterColors.WeaponColor.Value;
+					v110.Speed.Value = v110.Speed.Value;
+					local l__ProjectileHandler__111 = v110.ProjectileHandler;
+					l__ProjectileHandler__111.Projectile.Value = v110;
+					l__ProjectileHandler__111.Parent = l__Character__4;
+					v110.Parent = workspace;
+					l__Remotes__13.Projectile:FireServer(l__criticaleff__84, v109, l__LocalPlayer__2.CharacterColors.WeaponColor.Value);
+					local v112 = math.random(1, 2);
+					if v112 == 1 then
+						v112 = math.pi / 2;
+					elseif v112 == 2 then
+						v112 = -math.pi / 2;
+					end;
+					local v113 = l__Character__4.HumanoidRootPart.CFrame * CFrame.Angles(0, -math.pi * 135 / 180, 0) * CFrame.new(0, math.random(0, 2), -16) * CFrame.Angles(math.pi / 2, 0, v112);
+					local v114 = l__criticaleff__84:Clone();
+					v114.Owner.Value = l__LocalPlayer__2;
+					v114.Origin.Value = v113.p;
+					v114.CFrame = v113;
+					v114.Color = l__LocalPlayer__2.CharacterColors.WeaponColor.Value;
+					v114.Speed.Value = v114.Speed.Value;
+					local l__ProjectileHandler__115 = v114.ProjectileHandler;
+					l__ProjectileHandler__115.Projectile.Value = v114;
+					l__ProjectileHandler__115.Parent = l__Character__4;
+					v114.Parent = workspace;
+					l__Remotes__13.Projectile:FireServer(l__criticaleff__84, v113, l__LocalPlayer__2.CharacterColors.WeaponColor.Value);
+				end;
+			end;
+		end;
+	end;
+end;
+l__mouse__3.KeyDown:Connect(function(p4)
+	if l__Character__4.Stats.CurrentHP.Value > 0 and l__Character__4.Stats.Disable.Value == 0 then
+		if string.lower(p4) == "q" then
+			usingability1();
+		end;
+		if string.lower(p4) == "e" then
+			usingability2();
+		end;
+		if string.lower(p4) == "f" then
+			usingcritical();
+		end;
+	end;
+end);
+local l__UserInputService__116 = game:GetService("UserInputService");
+function changeKeys()
+	l__MainHUD__9.Abilites.Attack.KeyToPress.Text = "LRT";
+	l__MainHUD__9.Abilites.Ability1.KeyToPress.Text = "X";
+	l__MainHUD__9.Abilites.Ability2.KeyToPress.Text = "B";
+	l__MainHUD__9.Abilites.Critical.KeyToPress.Text = "Y";
+	l__MainHUD__9.Abilites.Attack.KeyToPress.TextXAlignment = "Left";
+	l__MainHUD__9.Abilites.Ability1.KeyToPress.TextXAlignment = "Left";
+	l__MainHUD__9.Abilites.Ability2.KeyToPress.TextXAlignment = "Left";
+	l__MainHUD__9.Abilites.Critical.KeyToPress.TextXAlignment = "Left";
+	l__MainHUD__9.Abilites.Attack.KeyToPress.TextWrapped = false;
+	l__MainHUD__9.Abilites.Ability1.KeyToPress.TextWrapped = false;
+	l__MainHUD__9.Abilites.Ability2.KeyToPress.TextWrapped = false;
+	l__MainHUD__9.Abilites.Critical.KeyToPress.TextWrapped = false;
+	l__MainHUD__9.Abilites.Attack.KeyToPress.TextScaled = false;
+	l__MainHUD__9.Abilites.Ability1.KeyToPress.TextScaled = false;
+	l__MainHUD__9.Abilites.Ability2.KeyToPress.TextScaled = false;
+	l__MainHUD__9.Abilites.Critical.KeyToPress.TextScaled = false;
+	l__MainHUD__9.Abilites.Attack.KeyToPress.TextSize = 28;
+	l__MainHUD__9.Abilites.Ability1.KeyToPress.TextSize = 28;
+	l__MainHUD__9.Abilites.Ability2.KeyToPress.TextSize = 28;
+	l__MainHUD__9.Abilites.Critical.KeyToPress.TextSize = 28;
+end;
+l__UserInputService__116.GamepadConnected:connect(function()
+	changeKeys();
+end);
+if l__UserInputService__116.GamepadEnabled == true then
+	changeKeys();
+end;
+l__UserInputService__116.InputBegan:connect(function(p5)
+	if p5.KeyCode == Enum.KeyCode.ButtonR1 or p5.KeyCode == Enum.KeyCode.ButtonL1 then
+		usingattack();
+		return;
+	end;
+	if p5.KeyCode == Enum.KeyCode.ButtonX then
+		usingability1();
+		return;
+	end;
+	if p5.KeyCode == Enum.KeyCode.ButtonB then
+		usingability2();
+		return;
+	end;
+	if p5.KeyCode == Enum.KeyCode.ButtonY then
+		usingcritical();
+	end;
+end);
+function damage(p6, p7)
+	coroutine.resume(coroutine.create(function()
+		return game.ReplicatedStorage.Remotes.Damage:InvokeServer(pass(), workspace.RealTime.Value, p6, p7);
+	end));
+end;
+function correctdamage(p8, p9)
+	return game.ReplicatedStorage.Remotes.Damage:InvokeServer(pass(), workspace.RealTime.Value, p8, p9);
+end;
+function heal(p10, p11)
+	coroutine.resume(coroutine.create(function()
+		local v117 = game.ReplicatedStorage.Remotes.Heal:InvokeServer(pass(), p10, p11);
+	end));
+end;
+local u15 = nil;
+function effectapply(p12, p13, p14, p15, p16)
+	coroutine.resume(coroutine.create(function()
+		u15 = pass();
+		local v118 = game.ReplicatedStorage.Remotes.EffectApply:InvokeServer(u15, p12, p13, p14, p15, p16);
+	end));
+end;
+function hitbox(p17, p18, p19, p20, p21, p22, p23)
+	local l__Character__119 = p21.Character;
+	local v120 = Instance.new("Part");
+	v120.Shape = 0;
+	v120.Size = Vector3.new(p17, p17, p17);
+	v120.CFrame = l__Character__119.HumanoidRootPart.CFrame * CFrame.new(p19, p20, -p18);
+	v120.Anchored = true;
+	v120.CanCollide = false;
+	v120.Transparency = 1;
+	v120.TopSurface = "Smooth";
+	v120.BottomSurface = "Smooth";
+	v120.BrickColor = BrickColor.new("Bright red");
+	v120.Name = "Hitbox";
+	game.Debris:AddItem(v120, 0.5);
+	v120.Parent = workspace;
+	local v121, v122, v123 = pairs(game.Workspace:GetChildren());
+	while true do
+		local v124, v125 = v121(v122, v123);
+		if v124 then
+
+		else
+			break;
+		end;
+		v123 = v124;
+		if v125:FindFirstChild("Humanoid") ~= nil then
+			if v125:FindFirstChild("Torso") ~= nil then
+				if (v120.Position - v125.Torso.Position).magnitude <= p17 / 2 then
+					if v125 ~= l__Character__119 then
+						if v125:FindFirstChild("Humanoid") then
+							if v125:FindFirstChild(p23) then
+								if v125:FindFirstChild(l__Character__119.Name) then
+									return;
+								end;
+							end;
+							local v126 = Instance.new("StringValue");
+							v126.Name = p23;
+							v126.Parent = v125;
+							local v127 = Instance.new("StringValue");
+							v127.Name = l__Character__119.Name;
+							v127.Parent = v125;
+							game.Debris:AddItem(v126, 0.3);
+							game.Debris:AddItem(v127, 0.3);
+							if v125 ~= l__Character__119 then
+								if 0 < v125.Stats.CurrentHP.Value then
+									if v125.Stats.Safe.Value <= 0 then
+										damage(v125, p22);
+									end;
+								end;
+							end;
+						end;
+					end;
+				end;
+			end;
+		end;	
+	end;
+end;
+function hitboxspin(p24, p25, p26, p27, p28, p29, p30)
+	local l__Character__128 = p28.Character;
+	local v129 = Instance.new("Part");
+	v129.Shape = 0;
+	v129.Size = Vector3.new(p24, p24, p24);
+	v129.CFrame = l__Character__128.HumanoidRootPart.CFrame * CFrame.new(p26, p27, -p25);
+	v129.Anchored = true;
+	v129.CanCollide = false;
+	v129.Transparency = 1;
+	v129.TopSurface = "Smooth";
+	v129.BottomSurface = "Smooth";
+	v129.BrickColor = BrickColor.new("Bright red");
+	v129.Name = "Hitbox";
+	game.Debris:AddItem(v129, 0.5);
+	v129.Parent = workspace;
+	local v130, v131, v132 = pairs(game.Workspace:GetChildren());
+	while true do
+		local v133, v134 = v130(v131, v132);
+		if v133 then
+
+		else
+			break;
+		end;
+		v132 = v133;
+		if v134:FindFirstChild("Humanoid") ~= nil then
+			if v134:FindFirstChild("Torso") ~= nil then
+				if (v129.Position - v134.Torso.Position).magnitude <= p24 / 2 then
+					if v134 ~= l__Character__128 then
+						if v134:FindFirstChild("Humanoid") then
+							if v134:FindFirstChild(p30) then
+								if v134:FindFirstChild(l__Character__128.Name) then
+									return;
+								end;
+							end;
+							local v135 = Instance.new("StringValue");
+							v135.Name = p30;
+							v135.Parent = v134;
+							local v136 = Instance.new("StringValue");
+							v136.Name = l__Character__128.Name;
+							v136.Parent = v134;
+							game.Debris:AddItem(v135, 0.5);
+							game.Debris:AddItem(v136, 0.5);
+							if v134 ~= l__Character__128 then
+								if 0 < v134.Stats.CurrentHP.Value then
+									if v134.Stats.Safe.Value <= 0 then
+										coroutine.resume(coroutine.create(function()
+											heal(l__Character__128, (game.ReplicatedStorage.Remotes.Damage:InvokeServer(u15, workspace.RealTime.Value, v134, p29)));
+										end));
+									end;
+								end;
+							end;
+						end;
+					end;
+				end;
+			end;
+		end;	
+	end;
+end;
+local u16 = false;
+local l__Attack__17 = l__MainHUD__9.Abilites.Attack;
+function attackcoolingdown()
+	coroutine.resume(coroutine.create(function()
+		if u16 == false then
+			u16 = true;
+			while true do
+				if 0 < u1 then
+
+				else
+					break;
+				end;
+				l__Attack__17.Icon.ImageTransparency = 0.5;
+				l__Attack__17.CooldownDisplay.Text = u1;
+				if u1 < 0.1 then
+					l__Attack__17.CooldownDisplay.Text = "";
+				end;
+				u1 = u1 - 0.1;
+				wait2(0.1);			
+			end;
+			l__Attack__17.Icon.ImageTransparency = 0;
+			l__Attack__17.CooldownDisplay.Text = "";
+			u1 = 0;
+			u16 = false;
+		end;
+	end));
+end;
+local u18 = false;
+local l__Ability1__19 = l__MainHUD__9.Abilites.Ability1;
+function ability1coolingdown()
+	coroutine.resume(coroutine.create(function()
+		if u18 == false then
+			u18 = true;
+			while true do
+				if 0 < u3 then
+
+				else
+					break;
+				end;
+				l__Ability1__19.Icon.ImageTransparency = 0.5;
+				l__Ability1__19.CooldownDisplay.Text = u3;
+				if u3 < 0.1 then
+					l__Ability1__19.CooldownDisplay.Text = "";
+				end;
+				u3 = u3 - 0.1;
+				wait2(0.1);			
+			end;
+			l__Ability1__19.Icon.ImageTransparency = 0;
+			l__Ability1__19.CooldownDisplay.Text = "";
+			u3 = 0;
+			u18 = false;
+		end;
+	end));
+end;
+local u20 = false;
+local l__Ability2__21 = l__MainHUD__9.Abilites.Ability2;
+function ability2coolingdown()
+	coroutine.resume(coroutine.create(function()
+		if u20 == false then
+			u20 = true;
+			while true do
+				if 0 < u5 then
+
+				else
+					break;
+				end;
+				l__Ability2__21.Icon.ImageTransparency = 0.5;
+				l__Ability2__21.CooldownDisplay.Text = u5;
+				if u5 < 0.1 then
+					l__Ability2__21.CooldownDisplay.Text = "";
+				end;
+				u5 = u5 - 0.1;
+				wait2(0.1);			
+			end;
+			l__Ability2__21.Icon.ImageTransparency = 0;
+			l__Ability2__21.CooldownDisplay.Text = "";
+			u5 = 0;
+			u20 = false;
+		end;
+	end));
+end;
+local u22 = false;
+local l__Critical__23 = l__MainHUD__9.Abilites.Critical;
+function criticalcoolingdown()
+	coroutine.resume(coroutine.create(function()
+		if u22 == false then
+			u22 = true;
+			while true do
+				if 0 < u7 then
+
+				else
+					break;
+				end;
+				l__Critical__23.Icon.ImageTransparency = 0.5;
+				local v137 = Instance.new("IntValue");
+				v137.Value = u7 * 10;
+				l__Critical__23.CooldownDisplay.Text = v137.Value / 10;
+				if u7 < 0.1 then
+					l__Critical__23.CooldownDisplay.Text = "";
+				end;
+				u7 = u7 - 0.1;
+				wait2(0.1);			
+			end;
+			l__Critical__23.Icon.ImageTransparency = 0;
+			l__Critical__23.CooldownDisplay.Text = "";
+			u7 = 0;
+			u22 = false;
+		end;
+	end));
+end;
+l__MainHUD__9.Abilites.Attack.MouseButton1Click:connect(usingattack);
+l__MainHUD__9.Abilites.Ability1.MouseButton1Click:connect(usingability1);
+l__MainHUD__9.Abilites.Ability2.MouseButton1Click:connect(usingability2);
+l__MainHUD__9.Abilites.Critical.MouseButton1Click:connect(usingcritical);
