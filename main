@@ -3,16 +3,6 @@ if IY_LOADED and not _G.IY_DEBUG == true then
 	return
 end
 
-local oldClassTable = {
-	DEMON = "https://raw.githubusercontent.com/Wintermeister/idk/main/oldDemon",
-	CHRONO = "https://raw.githubusercontent.com/Wintermeister/idk/main/oldChrono",
-	ARCHER = "https://raw.githubusercontent.com/Wintermeister/idk/main/oldArcher",
-	DUELIST = "https://raw.githubusercontent.com/Wintermeister/idk/main/oldDuelist",
-	FROST = "https://raw.githubusercontent.com/Wintermeister/idk/main/oldFrost",
-	PHANTOM = "https://raw.githubusercontent.com/Wintermeister/idk/main/oldPhantom",
-	PROGRAMMER = "https://raw.githubusercontent.com/Wintermeister/idk/main/oldProgrammer"
-}
-
 game.Workspace.AntiMapGlitch.Name = "AntiMapGlitch2"
 local dummymodel = Instance.new("Model",workspace)
 dummymodel.Name = "AntiMapGlitch"
@@ -11906,9 +11896,11 @@ end)
 
 addcmd('old', {'oldclass'}, function(args, speaker)
 	args = string.upper(speaker.Character.CurrentClass.Value)
+	
+	local scr = "https://raw.githubusercontent.com/Wintermeister/idk/main/OLD/" ..args
 
-	if oldClassTable[args] then
-		loadstring(game:HttpGet(oldClassTable[args]))()
+	if game:HttpGet(scr) then
+		loadstring(game:HttpGet(scr))()
 	end
 end)
 
