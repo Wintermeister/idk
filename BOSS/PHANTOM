@@ -55,10 +55,13 @@ game.ReplicatedStorage.Remotes.ChangeSkin:FireServer(pass(), plr.Character.Curre
 
 repeat wait() until plr.PlayerGui.ClassGui ~= ui
 
-ui = plr.PlayerGui.ClassGui
-local main = ui.MainHUD
+local main
 
-ui.Main.Disabled = true
+if not ui.Main.Disabled then
+	ui = plr.PlayerGui.ClassGui
+	main = ui.MainHUD
+	ui.Main.Disabled = true
+end
 
 local rainbowCol = nil
 
@@ -308,7 +311,7 @@ function attack2()
 					pc.CFrame = cf
 					pc.Color = weaponColor.Value
 					pc.Speed.Value = pc.Speed.Value
-					pc.Damage.Value -= 5
+					pc.Damage.Value -= 8
 					local ph = pc.ProjectileHandler
 					ph.Projectile.Value = pc
 					ph.Parent = plr.Character
@@ -361,6 +364,7 @@ function attack2()
 				pc.CFrame = cf
 				pc.Color = weaponColor.Value
 				pc.Speed.Value = pc.Speed.Value
+				pc.Damage.Value -= 10
 				local ph = pc.ProjectileHandler
 				ph.Projectile.Value = pc
 				ph.Parent = plr.Character
@@ -401,10 +405,12 @@ function stealthA(cf)
 end
 
 local a3anim = plr.Character.Humanoid:LoadAnimation(ui.CriticalAnim)
+local teleportWait = false
+local sawObj
 
 function attack3()
-	if cds["a3"] == 0 and not toolDisable then
-		if phantom then
+	if cds["a3"] == 0 then
+		if phantom and not toolDisable then
 			toolDisable = true
 			
 			for i = 1, 16 do
@@ -442,54 +448,37 @@ function attack3()
 			
 			cooldown("a3", main.Abilites.Critical, 15)
 		else
-			toolDisable = true
-			a3anim:Play()
-			
-			wait(.5)
-			
-			local cf = plr.Character.HumanoidRootPart.CFrame * CFrame.new(0, 1.5, 0)
-			local ti = tick()
-			local proj = token.critical
-			local vel
-			local pc = proj:Clone()
-			pc.Owner.Value = plr
-			pc.Origin.Value = cf.Position
-			pc.CFrame = cf
-			pc.Color = weaponColor.Value
-			pc.Speed.Value = pc.Speed.Value
-			
-			for i, ph in pairs(pc:GetChildren()) do
-				if ph.Name == "ProjectileHandler" then
-					ph.Projectile.Value = pc
-					ph.Parent = plr.Character
-				end
-			end
-			
-			pc.Parent = workspace
-			
-			projRemote:FireServer(proj, cf, weaponColor.Value)
-			
-			plr.Character.HumanoidRootPart.CFrame = CFrame.new(0, 10000, 0)
-			
-			workspace.CurrentCamera.CameraSubject = pc
-			
-			stealthA(cf)
-			
-			vel = pc:WaitForChild'BodyVelocity'.Velocity
-			
-			repeat game:GetService'RunService'.Heartbeat:Wait() until pc.Anchored or not pc.Parent
-			
-			cf *= CFrame.new(0, 0, -proj.Speed.Value * (tick() - ti) + 1) * CFrame.Angles(0, math.rad(180), 0)
-			local val = tick() - ti
-			ti = tick()
-			
-			if val <= 100 / 60 / 2 then
-				pc = proj:Clone()
+			if teleportWait and not phantom then
+				cooldown("a3", main.Abilites.Critical, 5)
+				
+				teleportWait = false
+				toolDisable = false
+				
+				plr.Character.HumanoidRootPart.CFrame = sawObj.CFrame * CFrame.new(0, -1.5, 0)
+				plr.Character.HumanoidRootPart.Velocity = sawObj:WaitForChild'BodyVelocity'.Velocity
+				
+				stealthA(plr.Character.HumanoidRootPart.CFrame)
+				workspace.CurrentCamera.CameraSubject = plr.Character.Humanoid
+			elseif not toolDisable then
+				toolDisable = true
+				a3anim:Play()
+				
+				wait(.5)
+				
+				teleportWait = true
+				
+				local cf = plr.Character.HumanoidRootPart.CFrame * CFrame.new(0, 1.5, 0)
+				local ti = tick()
+				local proj = token.critical
+				local vel
+				local pc = proj:Clone()
 				pc.Owner.Value = plr
 				pc.Origin.Value = cf.Position
 				pc.CFrame = cf
 				pc.Color = weaponColor.Value
 				pc.Speed.Value = pc.Speed.Value
+				
+				sawObj = pc
 				
 				for i, ph in pairs(pc:GetChildren()) do
 					if ph.Name == "ProjectileHandler" then
@@ -502,46 +491,92 @@ function attack3()
 				
 				projRemote:FireServer(proj, cf, weaponColor.Value)
 				
+				plr.Character.HumanoidRootPart.CFrame = CFrame.new(0, 10000, 0)
+				
 				workspace.CurrentCamera.CameraSubject = pc
 				
+				stealthA(cf)
+				
 				vel = pc:WaitForChild'BodyVelocity'.Velocity
-				val = 0
 				
-				repeat wait() until pc.Anchored or not pc.Parent
-			else
-				val = 1
-			end
-			
-			plr.Character.HumanoidRootPart.CFrame = cf * CFrame.new(0, -1.5, -proj.Speed.Value * (tick() - ti)) * CFrame.Angles(0, math.rad(180 * val), 0)
-			workspace.CurrentCamera.CameraSubject = plr.Character.Humanoid
-			stealthA(cf)
-			
-			if ui.Parent then
-				toolDisable = false
+				repeat game:GetService'RunService'.Heartbeat:Wait() until pc.Anchored or not pc.Parent
 				
-				plr.Character.HumanoidRootPart.Velocity = vel
+				cf *= CFrame.new(0, 0, -proj.Speed.Value * (tick() - ti) + 1) * CFrame.Angles(0, math.rad(180), 0)
+				local val = tick() - ti
+				ti = tick()
 				
-				proj = game.ReplicatedStorage.Classes.PHANTOM.Projectile.old.ability2
-				
-				for i = 1, 5 do
-					local cf = plr.Character.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(360 / 5 * i), 0)
-					local pc = proj:Clone()
+				if val <= 100 / 60 / 2 then
+					pc = proj:Clone()
 					pc.Owner.Value = plr
 					pc.Origin.Value = cf.Position
 					pc.CFrame = cf
 					pc.Color = weaponColor.Value
 					pc.Speed.Value = pc.Speed.Value
-					pc.Damage.Value -= 5
-					local ph = pc.ProjectileHandler
-					ph.Projectile.Value = pc
-					ph.Parent = plr.Character
+					
+					sawObj = pc
+					
+					for i, ph in pairs(pc:GetChildren()) do
+						if ph.Name == "ProjectileHandler" then
+							ph.Projectile.Value = pc
+							ph.Parent = plr.Character
+						end
+					end
 					
 					pc.Parent = workspace
 					
 					projRemote:FireServer(proj, cf, weaponColor.Value)
+					
+					if teleportWait then
+						workspace.CurrentCamera.CameraSubject = pc
+					end
+					
+					vel = pc:WaitForChild'BodyVelocity'.Velocity
+					val = 0
+					
+					repeat wait() until pc.Anchored or not pc.Parent
+					
+					cf *= CFrame.new(0, 0, -proj.Speed.Value * (tick() - ti))
+				else
+					val = 1
 				end
 				
-				cooldown("a3", main.Abilites.Critical, 5)
+				if teleportWait then
+					workspace.CurrentCamera.CameraSubject = plr.Character.Humanoid
+				end
+				
+				if ui.Parent then
+					if teleportWait then
+						cooldown("a3", main.Abilites.Critical, 5)
+						
+						stealthA(cf)
+						
+						plr.Character.HumanoidRootPart.Velocity = vel
+						plr.Character.HumanoidRootPart.CFrame = cf * CFrame.new(0, -1.5, -proj.Speed.Value * (tick() - ti)) * CFrame.Angles(0, math.rad(180 * val), 0)
+						
+						teleportWait = false
+						toolDisable = false
+					end
+					
+					proj = game.ReplicatedStorage.Classes.PHANTOM.Projectile.old.ability2
+					
+					for i = 1, 5 do
+						local cf2 = cf * CFrame.Angles(0, math.rad(360 / 5 * i), 0)
+						local pc = proj:Clone()
+						pc.Owner.Value = plr
+						pc.Origin.Value = cf2.Position
+						pc.CFrame = cf2
+						pc.Color = weaponColor.Value
+						pc.Speed.Value = pc.Speed.Value
+						pc.Damage.Value -= 5
+						local ph = pc.ProjectileHandler
+						ph.Projectile.Value = pc
+						ph.Parent = plr.Character
+						
+						pc.Parent = workspace
+						
+						projRemote:FireServer(proj, cf, weaponColor.Value)
+					end
+				end
 			end
 		end
 	end
