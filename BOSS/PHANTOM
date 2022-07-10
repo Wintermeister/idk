@@ -1,0 +1,606 @@
+local baseClass = "PHANTOM"
+
+
+
+local plr = game.Players.LocalPlayer
+
+if plr:FindFirstChild("remotesFired") == nil then
+    local v11 = Instance.new("IntValue", plr)
+    v11.Value = 0
+    v11.Name = "remotesFired"
+else
+    v11 = plr:FindFirstChild("remotesFired")
+end
+
+function pass()
+    local v12 = v11.Value + 1
+    v11.Value = v12
+    return "{CS-G10-" .. math.floor((v12 * 7) ^ 2.7) + 25 .. "-AB2g-dAB50NYU}"
+end
+
+function effectapply(p10, p11, p12, p13, p14)
+    coroutine.resume(coroutine.create(function()
+        u14 = pass()
+        local v62 = game.ReplicatedStorage.Remotes.EffectApply:InvokeServer(u14, p10, p11, p12, p13, p14)
+    end))
+end
+
+baseClass = game.ReplicatedStorage.Classes[baseClass]
+
+local sd = workspace.SuperDummy
+local inv = game.Players.LocalPlayer.PlayerData.Inventory
+local token = inv:FindFirstChild'EventToken'
+
+if token and not baseClass:FindFirstChild(token.Name) then
+	effectapply(sd, token, baseClass)
+	
+	token = baseClass:WaitForChild(token.Name)
+
+	for i, c in pairs(baseClass.MainSkin:GetChildren()) do
+		effectapply(sd, c, token)
+	end
+	
+	effectapply(sd, game.ReplicatedStorage.Classes.PHANTOM.Projectile.old.critical, token)
+	effectapply(sd, game.ReplicatedStorage.Classes.MUSKETEER.Projectile.critical.ProjectileHandler, token:WaitForChild'critical')
+	effectapply(sd, game.ReplicatedStorage.Classes.MUSKETEER.Projectile.critical.Trail, token:WaitForChild'critical')
+else
+	token = baseClass[token.Name]
+end
+
+local ui = plr.PlayerGui.ClassGui
+local projRemote = game.ReplicatedStorage.Remotes.Projectile
+local weaponColor = plr.CharacterColors.WeaponColor
+
+game.ReplicatedStorage.Remotes.ChangeSkin:FireServer(pass(), plr.Character.CurrentClass.Value, token.Name)
+
+repeat wait() until plr.PlayerGui.ClassGui ~= ui
+
+ui = plr.PlayerGui.ClassGui
+local main = ui.MainHUD
+
+ui.Main.Disabled = true
+
+local rainbowCol = nil
+
+function guicolorchange()
+	if main.Parent then
+		main.Abilites.Attack.Icon.ImageColor3 = weaponColor.Value
+		main.Abilites.Ability1.Icon.ImageColor3 = weaponColor.Value
+		main.Abilites.Ability2.Icon.ImageColor3 = weaponColor.Value
+		main.Abilites.Critical.Icon.ImageColor3 = rainbowCol or weaponColor.Value
+	end
+end
+
+guicolorchange()
+
+weaponColor.Changed:Connect(guicolorchange)
+
+local hum = plr.Character.Humanoid
+
+function changeSpeed(ofs)
+	plr.Character.Humanoid.WalkSpeed = plr.Character.Stats.BaseSpeed.Value + plr.Character.Stats.ChangedSpeed.Value + ofs
+end
+
+local phantom = false
+local toolDisable = false
+local blindChars = {}
+
+cds = {a0 = 0, a1 = 0, a2 = 0, a3 = 0}
+cdt = {a0 = .7, a1 = .3, a2 = 4, a3 = 3}
+
+function rc()
+	local tab = {plr.Character}
+	
+	local rp = RaycastParams.new()
+	rp.FilterType = Enum.RaycastFilterType.Blacklist
+	rp.FilterDescendantsInstances = tab
+	
+	while not rac do
+		local ray = workspace:Raycast(plr.Character.HumanoidRootPart.Position, CFrame.new(Vector3.new(0,1,0),Vector3.new(0,0,0)).lookVector * 1000, rp)
+		
+		if ray then
+			if not ray.Instance:FindFirstChild'Terrain' or not ray.Instance.CanCollide then
+				table.insert(tab, ray.Instance)
+				rp.FilterDescendantsInstances = tab
+			else
+				return ray
+			end
+		end
+	end
+end
+
+function hitbox(pos, siz, dmg, effect, funct)
+	spawn(function()
+		local hb = Instance.new("Part", workspace)
+		hb.Transparency = 1
+		hb.Anchored = true
+		hb.CanCollide = false
+		hb.CanTouch = true
+		hb.CFrame = pos
+		hb.Size = siz
+		hb.TopSurface = "Smooth"
+		hb.BottomSurface = "Smooth"
+		hb.BrickColor = BrickColor.new("Bright red")
+		hb.Name = "Hitbox"
+		
+		if siz.X == siz.Y and siz.Y == siz.Z then
+			hb.Shape = Enum.PartType.Ball
+		end
+		
+		hb.Touched:Connect(function() end)
+		
+		game:GetService'Debris':AddItem(hb, .5)
+		
+		local hits = {}
+		
+		for i, c in pairs(hb:GetTouchingParts()) do
+			c = c.Parent
+			
+			if c and c:FindFirstChild'Humanoid' and c:FindFirstChild'HumanoidRootPart' and c ~= plr.Character and not hits[c] and c.Stats.CurrentHP.Value > 0 and c.Stats.Safe.Value <= 0 then
+				if funct then if funct(c) then return end end
+				
+				hits[c] = true
+				
+				if dmg > 0 then
+					game.ReplicatedStorage.Remotes.Damage:InvokeServer(pass(), workspace.RealTime.Value, c, dmg)
+				end
+				
+				if effect then
+					effectapply(c, effect, c.Head)
+				end
+			end
+		end
+	end)
+end
+
+function cooldown(var, obj, override)
+	spawn(function()
+		cds[var] = override or cdt[var]
+		
+		while cds[var] > 0 do
+			obj.Icon.ImageTransparency = .5
+			obj.CooldownDisplay.Text = cds[var]
+			
+			wait(.1)
+			
+			cds[var] -= .1
+			cds[var] = math.floor(cds[var] * 10 + .5) / 10
+		end
+		
+		cds[var] = 0
+		obj.Icon.ImageTransparency = 0
+		obj.CooldownDisplay.Text = ""
+	end)
+end
+
+local a0anim = plr.Character.Humanoid:LoadAnimation(ui.SpinAnim)
+
+function attack0()
+	if cds["a0"] == 0 and not toolDisable then
+		if phantom then
+			cooldown("a0", main.Abilites.Attack, .5)
+			
+			local cf = plr.Character.HumanoidRootPart.CFrame
+			local proj = game.ReplicatedStorage.Classes.PHANTOM.Projectile.spinattack
+			local pc = proj:Clone()
+			pc.Owner.Value = plr
+			pc.Origin.Value = cf.Position
+			pc.CFrame = cf
+			pc.Color = Color3.new(0, 0, 0)
+			pc.Speed.Value = pc.Speed.Value
+			local ph = pc.ProjectileHandler
+			ph.Projectile.Value = pc
+			ph.Parent = plr.Character
+			
+			hitbox(cf, Vector3.new(20, 4, 20), 10)
+			
+			pc.Parent = workspace
+			
+			projRemote:FireServer(proj, cf, Color3.new(0, 0, 0))
+		else
+			cooldown("a0", main.Abilites.Attack)
+			a0anim:Play()
+			
+			for i = -2, 2 do
+				delay(math.abs(i / 2 / 5), function()
+					local cf = plr.Character.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(i * 5), 0) * CFrame.new(0, 0, -2)
+					local proj = game.ReplicatedStorage.Classes.PHANTOM.Projectile.old.ability2
+					local pc = proj:Clone()
+					pc.Owner.Value = plr
+					pc.Origin.Value = cf.Position
+					pc.CFrame = cf
+					pc.Color = weaponColor.Value
+					pc.Speed.Value = pc.Speed.Value
+					pc.Damage.Value -= 5
+					local ph = pc.ProjectileHandler
+					ph.Projectile.Value = pc
+					ph.Parent = plr.Character
+					
+					pc.Parent = workspace
+					
+					projRemote:FireServer(proj, cf, weaponColor.Value)
+				end)
+			end
+		end
+	end
+end
+
+function togglePhantom(cd)
+	cooldown("a1", main.Abilites.Ability1, cd)
+	
+	phantom = not phantom
+	
+	local proj = game.ReplicatedStorage.Classes.PHANTOM.Projectile
+	local cf = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+	
+	if phantom then
+		main.Abilites.Attack.Chain.Text = "! ! !"
+		main.Abilites.Ability2.Chain.Text = "! ! !"
+		main.Abilites.Critical.Chain.Text = "! ! !"
+		proj = proj.ability1eff1
+		changeSpeed(20)
+		
+		spawn(function()
+			while phantom and ui.Parent do
+				hitbox(plr.Character.HumanoidRootPart.CFrame, Vector3.new(10, 10, 10), 0, game.ReplicatedStorage.Classes.PHANTOM.Effects.Blind, function(chara)
+					if not blindChars[chara] then
+						blindChars[chara] = true
+						
+						delay(1.5, function()
+							blindChars[chara] = nil
+						end)
+					else
+						return true
+					end
+				end)
+				
+				game:GetService'RunService'.Heartbeat:Wait()
+			end
+		end)
+	else
+		main.Abilites.Attack.Chain.Text = ""
+		main.Abilites.Ability2.Chain.Text = ""
+		main.Abilites.Critical.Chain.Text = ""
+		proj = proj.ability1eff2
+		changeSpeed(0)
+	end
+	
+	local pc = proj:Clone()
+	pc.Owner.Value = plr
+	pc.Origin.Value = cf.Position
+	pc.CFrame = cf
+	pc.Color = weaponColor.Value
+	pc.Speed.Value = pc.Speed.Value
+	pc.Damage.Value -= 5
+	local ph = pc.ProjectileHandler
+	ph.Projectile.Value = pc
+	ph.Parent = plr.Character
+	
+	pc.Parent = workspace
+	
+	projRemote:FireServer(proj, cf, weaponColor.Value)
+end
+
+function attack1()
+	if cds["a1"] == 0 and not toolDisable then
+		togglePhantom()
+	end
+end
+
+function attack2()
+	if cds["a2"] == 0 and not toolDisable then
+		cooldown("a2", main.Abilites.Ability2)
+		
+		for i = 1, 3 do
+			local maxBounce = 10
+			
+			local ti = tick()
+			local ctl = tick()
+			local cf = plr.Character.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(360 / 3 * i), 0)
+			local bounce = 0
+			
+			spawn(function()
+				while ti + 2 > tick() and bounce < maxBounce and ui.Parent do
+					local proj = game.ReplicatedStorage.Classes.PHANTOM.Projectile.ability2
+					local pc = proj:Clone()
+					pc.Owner.Value = plr
+					pc.Origin.Value = cf.Position
+					pc.CFrame = cf
+					pc.Color = weaponColor.Value
+					pc.Speed.Value = pc.Speed.Value
+					pc.Damage.Value -= 5
+					local ph = pc.ProjectileHandler
+					ph.Projectile.Value = pc
+					ph.Parent = plr.Character
+					
+					pc.Parent = workspace
+					
+					projRemote:FireServer(proj, cf, weaponColor.Value)
+					
+					repeat game:GetService'RunService'.Heartbeat:Wait() until pc.Anchored or not pc.Parent
+					
+					cf *= CFrame.new(0, 0, -proj.Speed.Value * (tick() - ctl))
+					
+					local angle = CFrame.new(0, 0, 0)
+					
+					if tick() - ctl + .0625 < proj.Range.Value / proj.Speed.Value then
+						angle = CFrame.new(0, 0, proj.Size.X * 2) * CFrame.Angles(0, math.rad(180), 0)
+					end
+					
+					local cd = 50
+					local cp = nil
+					
+					for i, c in pairs(workspace:GetChildren()) do
+						if c:FindFirstChild'Humanoid' and c:FindFirstChild'HumanoidRootPart' and c ~= plr.Character then
+							local dist = (c.HumanoidRootPart.Position - cf.Position).Magnitude
+							
+							if dist < cd then
+								cd = dist
+								cp = c
+							end
+						end
+					end
+					
+					if cp then
+						local cfp = cf.Position
+						local hrpp = cp.HumanoidRootPart.Position
+						
+						angle = cf:Inverse().Rotation * CFrame.new(cfp, Vector3.new(hrpp.X, cfp.Y, hrpp.Z)).Rotation
+					end
+					
+					cf *= angle
+					ctl = tick()
+					
+					bounce += 1
+				end
+				
+				local proj = game.ReplicatedStorage.Classes.BOMBER.Projectile.ability2
+				local pc = proj:Clone()
+				pc.Owner.Value = plr
+				pc.Origin.Value = cf.Position
+				pc.CFrame = cf
+				pc.Color = weaponColor.Value
+				pc.Speed.Value = pc.Speed.Value
+				local ph = pc.ProjectileHandler
+				ph.Projectile.Value = pc
+				ph.Parent = plr.Character
+				
+				pc.Parent = workspace
+				
+				projRemote:FireServer(proj, cf, weaponColor.Value)
+			end)
+		end
+	end
+end
+
+local stealth = false
+
+function stealthA(cf)
+	stealth = not stealth
+	
+	local invis
+	
+	if stealth then
+		invis = game.ReplicatedStorage.Classes.RECON.Projectile.old.ability2a
+	else
+		invis = game.ReplicatedStorage.Classes.RECON.Projectile.old.ability2b
+	end
+	
+	local ic = invis:Clone()
+	ic.Owner.Value = plr
+	ic.Origin.Value = cf.Position
+	ic.CFrame = cf
+	ic.Color = weaponColor.Value
+	local ih = ic.ProjectileHandler
+	ih.Projectile.Value = ic
+	ih.Parent = plr.Character
+	
+	ic.Parent = workspace
+	
+	projRemote:FireServer(invis, cf, weaponColor.Value)
+end
+
+local a3anim = plr.Character.Humanoid:LoadAnimation(ui.CriticalAnim)
+
+function attack3()
+	if cds["a3"] == 0 and not toolDisable then
+		if phantom then
+			toolDisable = true
+			
+			for i = 1, 16 do
+				rainbowCol = Color3.fromHSV(tick() - math.floor(tick()), 1, 1)
+				guicolorchange()
+				
+				for x = 1, 15 do
+					local t = tick() + x / 15
+					local col = Color3.fromHSV(t - math.floor(t), 1, 1)
+					local cf = CFrame.new(plr.Character.HumanoidRootPart.Position) * CFrame.Angles(0, math.rad(i * 360 / 32 + x * 360 / 15), 0) * CFrame.new(0, 0, -2)
+					local proj = game.ReplicatedStorage.Classes.PHANTOM.Projectile.old.ability2
+					local pc = proj:Clone()
+					pc.Owner.Value = plr
+					pc.Origin.Value = cf.Position
+					pc.CFrame = cf
+					pc.Color = col
+					pc.Speed.Value = pc.Speed.Value
+					pc.Damage.Value -= 5
+					local ph = pc.ProjectileHandler
+					ph.Projectile.Value = pc
+					ph.Parent = plr.Character
+					
+					pc.Parent = workspace
+					
+					projRemote:FireServer(proj, cf, col)
+				end
+				
+				wait(.1)
+			end
+			
+			toolDisable = false
+			rainbowCol = nil
+			guicolorchange()
+			togglePhantom(8)
+			
+			cooldown("a3", main.Abilites.Critical, 15)
+		else
+			toolDisable = true
+			a3anim:Play()
+			
+			wait(.5)
+			
+			local cf = plr.Character.HumanoidRootPart.CFrame * CFrame.new(0, 1.5, 0)
+			local ti = tick()
+			local proj = token.critical
+			local vel
+			local pc = proj:Clone()
+			pc.Owner.Value = plr
+			pc.Origin.Value = cf.Position
+			pc.CFrame = cf
+			pc.Color = weaponColor.Value
+			pc.Speed.Value = pc.Speed.Value
+			
+			for i, ph in pairs(pc:GetChildren()) do
+				if ph.Name == "ProjectileHandler" then
+					ph.Projectile.Value = pc
+					ph.Parent = plr.Character
+				end
+			end
+			
+			pc.Parent = workspace
+			
+			projRemote:FireServer(proj, cf, weaponColor.Value)
+			
+			plr.Character.HumanoidRootPart.CFrame = CFrame.new(0, 10000, 0)
+			
+			workspace.CurrentCamera.CameraSubject = pc
+			
+			stealthA(cf)
+			
+			vel = pc:WaitForChild'BodyVelocity'.Velocity
+			
+			repeat game:GetService'RunService'.Heartbeat:Wait() until pc.Anchored or not pc.Parent
+			
+			cf *= CFrame.new(0, 0, -proj.Speed.Value * (tick() - ti) + 1) * CFrame.Angles(0, math.rad(180), 0)
+			local val = tick() - ti
+			ti = tick()
+			
+			if val <= 100 / 60 / 2 then
+				pc = proj:Clone()
+				pc.Owner.Value = plr
+				pc.Origin.Value = cf.Position
+				pc.CFrame = cf
+				pc.Color = weaponColor.Value
+				pc.Speed.Value = pc.Speed.Value
+				
+				for i, ph in pairs(pc:GetChildren()) do
+					if ph.Name == "ProjectileHandler" then
+						ph.Projectile.Value = pc
+						ph.Parent = plr.Character
+					end
+				end
+				
+				pc.Parent = workspace
+				
+				projRemote:FireServer(proj, cf, weaponColor.Value)
+				
+				workspace.CurrentCamera.CameraSubject = pc
+				
+				vel = pc:WaitForChild'BodyVelocity'.Velocity
+				val = 0
+				
+				repeat wait() until pc.Anchored or not pc.Parent
+			else
+				val = 1
+			end
+			
+			plr.Character.HumanoidRootPart.CFrame = cf * CFrame.new(0, -1.5, -proj.Speed.Value * (tick() - ti)) * CFrame.Angles(0, math.rad(180 * val), 0)
+			workspace.CurrentCamera.CameraSubject = plr.Character.Humanoid
+			stealthA(cf)
+			
+			if ui.Parent then
+				toolDisable = false
+				
+				plr.Character.HumanoidRootPart.Velocity = vel
+				
+				proj = game.ReplicatedStorage.Classes.PHANTOM.Projectile.old.ability2
+				
+				for i = 1, 5 do
+					local cf = plr.Character.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(360 / 5 * i), 0)
+					local pc = proj:Clone()
+					pc.Owner.Value = plr
+					pc.Origin.Value = cf.Position
+					pc.CFrame = cf
+					pc.Color = weaponColor.Value
+					pc.Speed.Value = pc.Speed.Value
+					pc.Damage.Value -= 5
+					local ph = pc.ProjectileHandler
+					ph.Projectile.Value = pc
+					ph.Parent = plr.Character
+					
+					pc.Parent = workspace
+					
+					projRemote:FireServer(proj, cf, weaponColor.Value)
+				end
+				
+				cooldown("a3", main.Abilites.Critical, 5)
+			end
+		end
+	end
+end
+
+function reqs(funct)
+	if plr.Character.Stats.Disable.Value ~= 0 then return end
+	if plr.Character.Stats.CurrentHP.Value <= 0 then return end
+	if not plr.PlayerGui:FindFirstChild'ClassGui' then return end
+	if plr.PlayerGui.ClassGui ~= ui then return end
+	
+	funct()
+end
+
+game.Players.LocalPlayer:GetMouse().Button1Down:Connect(function()
+	reqs(attack0)
+end)
+
+game:GetService'UserInputService'.InputBegan:Connect(function(key, typ)
+	if typ then return end
+	
+	if key.KeyCode == Enum.KeyCode.Q then
+		reqs(attack1)
+	end
+	if key.KeyCode == Enum.KeyCode.E then
+		reqs(attack2)
+	end
+	if key.KeyCode == Enum.KeyCode.F then
+		reqs(attack3)
+	end
+end)
+
+main:WaitForChild'Abilites':WaitForChild'Attack'.MouseButton1Click:Connect(function() reqs(attack0) end)
+main:WaitForChild'Abilites':WaitForChild'Ability1'.MouseButton1Click:Connect(function() reqs(attack1) end)
+main:WaitForChild'Abilites':WaitForChild'Ability2'.MouseButton1Click:Connect(function() reqs(attack2) end)
+main:WaitForChild'Abilites':WaitForChild'Critical'.MouseButton1Click:Connect(function() reqs(attack3) end)
+
+repeat wait() until plr.Character:FindFirstChild'Extra'
+
+local originalInfo = {}
+local newInfo = {
+	CName = "PHANTOM BOSS",
+	Attack = "Move0Name - NIL",
+	Ability1 = "Move1Name - NIL",
+	Ability2 = "Move2Name - NIL",
+	Critical = "Move3Name - NIL",
+	Credit = "CLASS DESCRIPTION"
+}
+
+for i, c in pairs(baseClass.ClassInfo:GetChildren()) do
+	originalInfo[c] = c.Value
+	
+	if newInfo[c.Name] then
+		c.Value = newInfo[c.Name]
+	end
+end
+
+repeat game:GetService'RunService'.Heartbeat:Wait() until not ui.Parent
+
+for i, c in pairs(originalInfo) do
+	i.Value = c
+end
