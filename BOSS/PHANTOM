@@ -57,10 +57,13 @@ repeat wait() until plr.PlayerGui.ClassGui ~= ui
 
 local main
 
+ui = plr.PlayerGui.ClassGui
+
 if not ui.Main.Disabled then
-	ui = plr.PlayerGui.ClassGui
 	main = ui.MainHUD
 	ui.Main.Disabled = true
+else
+	ui = nil
 end
 
 local rainbowCol = nil
