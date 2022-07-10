@@ -392,7 +392,7 @@ function stealthdrain()
 		v44.TintColor = Color3.new(0.8, 0.8, 1);
 		game.Debris:AddItem(v44, 1);
 		if u15 == 0 then
-			local l__ability2b__45 = game.ReplicatedStorage.Classes.RECON.Projectile.ability2b;
+			local l__ability2b__45 = game.ReplicatedStorage.Classes.RECON.Projectile.old.ability2b;
 			local v46 = l__Character__4.HumanoidRootPart.CFrame * CFrame.new(0, 0, 0) * CFrame.Angles(0, 0, 0);
 			local v47 = l__ability2b__45:Clone();
 			v47.Owner.Value = l__LocalPlayer__2;
