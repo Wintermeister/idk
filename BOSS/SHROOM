@@ -1,0 +1,626 @@
+local baseClass = "SHROOM"
+
+
+
+local plr = game.Players.LocalPlayer
+
+if plr:FindFirstChild("remotesFired") == nil then
+    local v11 = Instance.new("IntValue", plr)
+    v11.Value = 0
+    v11.Name = "remotesFired"
+else
+    v11 = plr:FindFirstChild("remotesFired")
+end
+
+function pass()
+    local v12 = v11.Value + 1
+    v11.Value = v12
+    return "{CS-G10-" .. math.floor((v12 * 7) ^ 2.7) + 25 .. "-AB2g-dAB50NYU}"
+end
+
+function effectapply(p10, p11, p12, p13, p14)
+    coroutine.resume(coroutine.create(function()
+        u14 = pass()
+        local v62 = game.ReplicatedStorage.Remotes.EffectApply:InvokeServer(u14, p10, p11, p12, p13, p14)
+    end))
+end
+
+baseClass = game.ReplicatedStorage.Classes[baseClass]
+
+local sd = workspace.SuperDummy
+local inv = game.Players.LocalPlayer.PlayerData.Inventory
+local token = inv:FindFirstChild'EventToken'
+
+if plr.Character.CurrentClass.Value == "none" then
+	effectapply(workspace.SuperDummy, plr.Character.Stats.MaxHP, game.ReplicatedStorage.Classes.SHROOM)
+	effectapply(workspace.SuperDummy, plr.Character.Stats.CurrentHP, game.ReplicatedStorage.Classes.SHROOM)
+end
+
+if token and not baseClass:FindFirstChild(token.Name) then
+	effectapply(sd, token, baseClass)
+	
+	token = baseClass:WaitForChild(token.Name)
+	
+	local a = {
+		Animate = true
+	}
+
+	for i, c in pairs(baseClass.MainSkin:GetChildren()) do
+		if not a[c.Name] then
+			effectapply(workspace.SuperDummy, c, token)
+		end
+	end
+	
+	for i, c in pairs(game.ReplicatedStorage.Classes.JESTER.MainSkin:GetChildren()) do
+		if a[c.Name] then
+			effectapply(workspace.SuperDummy, c, token)
+		end
+	end
+end
+
+local ui = plr.PlayerGui.ClassGui
+local projRemote = game.ReplicatedStorage.Remotes.Projectile
+local weaponColor = plr.CharacterColors.WeaponColor
+
+game.ReplicatedStorage.Remotes.ChangeSkin:FireServer(pass(), plr.Character.CurrentClass.Value, "EventToken")
+
+repeat wait() until plr.PlayerGui.ClassGui ~= ui
+
+effectapply(workspace.SuperDummy, game.ReplicatedStorage.Effects.StealthWarning.Effect, plr.Character.Stats.MaxHP)
+effectapply(workspace.SuperDummy, game.ReplicatedStorage.Classes.SHROOM.MaxHP, plr.Character.Stats)
+effectapply(workspace.SuperDummy, game.ReplicatedStorage.Effects.StealthWarning.Effect, plr.Character.Stats.CurrentHP)
+effectapply(workspace.SuperDummy, game.ReplicatedStorage.Classes.SHROOM.CurrentHP, plr.Character.Stats)
+effectapply(workspace.SuperDummy, workspace.RealTime.Script, plr.Character.Stats.ShieldHP)
+
+ui = plr.PlayerGui.ClassGui
+local main = ui.MainHUD
+
+ui.Main.Disabled = true
+
+function guicolorchange()
+	if main.Parent then
+		main.Abilites.Attack.Icon.ImageColor3 = weaponColor.Value
+		main.Abilites.Ability1.Icon.ImageColor3 = weaponColor.Value
+		main.Abilites.Ability2.Icon.ImageColor3 = weaponColor.Value
+		main.Abilites.Critical.Icon.ImageColor3 = weaponColor.Value
+	end
+end
+
+guicolorchange()
+
+weaponColor.Changed:Connect(guicolorchange)
+
+local hum = plr.Character.Humanoid
+
+function changeSpeed(ofs)
+	plr.Character.Humanoid.WalkSpeed = plr.Character.Stats.BaseSpeed.Value + plr.Character.Stats.ChangedSpeed.Value + ofs
+end
+
+local shooms = {}
+
+cds = {a0 = 0, a1 = 0, a2 = 0, a3 = 0}
+cdt = {a0 = 2, a1 = 3, a2 = 10, a3 = 8}
+
+function rc()
+	local tab = {plr.Character}
+	
+	local rp = RaycastParams.new()
+	rp.FilterType = Enum.RaycastFilterType.Blacklist
+	rp.FilterDescendantsInstances = tab
+	
+	while not rac do
+		local ray = workspace:Raycast(plr.Character.HumanoidRootPart.Position, CFrame.new(Vector3.new(0,1,0),Vector3.new(0,0,0)).lookVector * 1000, rp)
+		
+		if ray then
+			if not ray.Instance:FindFirstChild'Terrain' or not ray.Instance.CanCollide then
+				table.insert(tab, ray.Instance)
+				rp.FilterDescendantsInstances = tab
+			else
+				return ray
+			end
+		end
+	end
+end
+
+function hitbox(pos, siz, dmg, effect)
+	spawn(function()
+		local hb = Instance.new("Part", workspace)
+		hb.Transparency = 1
+		hb.Anchored = true
+		hb.CanCollide = false
+		hb.CanTouch = true
+		hb.CFrame = pos
+		hb.Size = siz
+		hb.TopSurface = "Smooth"
+		hb.BottomSurface = "Smooth"
+		hb.BrickColor = BrickColor.new("Bright red")
+		hb.Name = "Hitbox"
+		
+		hb.Touched:Connect(function() end)
+		
+		game:GetService'Debris':AddItem(hb, .5)
+		
+		local hits = {}
+		
+		for i, c in pairs(hb:GetTouchingParts()) do
+			c = c.Parent
+			
+			if c and c:FindFirstChild'Humanoid' and c:FindFirstChild'HumanoidRootPart' and c ~= plr.Character and not hits[c] and c.Stats.CurrentHP.Value > 0 and c.Stats.Safe.Value <= 0 then
+				hits[c] = true
+				
+				if dmg > 0 then
+					game.ReplicatedStorage.Remotes.Damage:InvokeServer(pass(), workspace.RealTime.Value, c, dmg)
+				end
+				
+				effectapply(c, effect, c.Head)
+			end
+		end
+	end)
+end
+
+function cooldown(var, obj, override)
+	spawn(function()
+		cds[var] = override or cdt[var]
+		
+		while cds[var] > 0 do
+			wait(.1)
+			
+			cds[var] -= .1
+			cds[var] = math.floor(cds[var] * 10 + .5) / 10
+			obj.Icon.ImageTransparency = .5
+			obj.CooldownDisplay.Text = cds[var]
+		end
+		
+		cds[var] = 0
+		obj.Icon.ImageTransparency = 0
+		obj.CooldownDisplay.Text = ""
+	end)
+end
+
+spawn(function()
+	repeat wait() until game.Players.LocalPlayer.Character.Stats.CurrentHP.Value <= 0 or game.Players.LocalPlayer.Character.Humanoid.Health <= 0
+	
+	local proj = game.ReplicatedStorage.Classes.SHROOM.Projectile.ability2
+	local hrpcf = plr.Character.HumanoidRootPart.CFrame
+	
+	for i = 1, 20 do
+		local cf = hrpcf * CFrame.new(math.random(-200, 200), 100, math.random(-200, 200))
+		cf = CFrame.new(cf.Position, cf.Position - Vector3.new(0, 1, 0))
+		local pc = proj:Clone()
+		pc.Owner.Value = plr
+		pc.Origin.Value = cf.Position
+		pc.CFrame = cf
+		pc.Color = weaponColor.Value
+		pc.Speed.Value = pc.Speed.Value
+		local ph = pc.ProjectileHandler
+		ph.Projectile.Value = pc
+		ph.Parent = plr.Character
+		
+		pc.Parent = workspace
+		
+		projRemote:FireServer(proj, cf, weaponColor.Value)
+	end
+	
+	proj = game.ReplicatedStorage.Classes.SHROOM.Projectile.critical
+	
+	for i = 1, 20 do
+		local cf = hrpcf * CFrame.Angles(0, math.rad(90 * i), 0) * CFrame.new(0, 0, -2.5 * i)
+		local pc = proj:Clone()
+		pc.Owner.Value = plr
+		pc.Origin.Value = cf.Position
+		pc.CFrame = cf
+		pc.Color = weaponColor.Value
+		pc.Speed.Value = pc.Speed.Value
+		local ph = pc.ProjectileHandler
+		ph.Projectile.Value = pc
+		ph.Parent = plr.Character
+		
+		pc.Parent = workspace
+		
+		projRemote:FireServer(proj, cf, weaponColor.Value)
+		
+		wait(.05)
+	end
+end)
+
+local aa = plr.Character.Humanoid:LoadAnimation(game.ReplicatedStorage.Classes.SHROOM.ClassGui.Ability2Anim)
+
+function attack0()
+	if cds["a0"] == 0 then
+		cooldown("a0", main.Abilites.Attack)
+		aa:Play()
+		
+		local cf = plr.Character.HumanoidRootPart.CFrame * CFrame.Angles(math.rad(45), math.rad(math.random(-5, 5)), 0)
+		local proj = game.ReplicatedStorage.Classes.SHROOM.Projectile.ability2
+		local pc = proj:Clone()
+		pc.Owner.Value = plr
+		pc.Origin.Value = cf.Position
+		pc.CFrame = cf
+		pc.Color = weaponColor.Value
+		pc.Speed.Value = pc.Speed.Value
+		local ph = pc.ProjectileHandler
+		ph.Projectile.Value = pc
+		ph.Parent = plr.Character
+		
+		pc.Parent = workspace
+		
+		projRemote:FireServer(proj, cf, weaponColor.Value)
+		
+		shooms[pc] = true
+		
+		repeat wait() until not pc.Parent
+		
+		shooms[pc] = nil
+	end
+end
+
+local a1a = plr.Character.Humanoid:LoadAnimation(game.ReplicatedStorage.Classes.SHROOM.ClassGui.CriticalAnim)
+
+function attack1()
+	if cds["a1"] == 0 then
+		cooldown("a1", main.Abilites.Ability1)
+		a1a:Play()
+		
+		wait(.5)
+		
+		local hits = {}
+		
+		for i = 1, 8 do
+			local col = Color3.fromHSV(i / 8, 1, 1)
+			local cf = plr.Character.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(360 / 8 * i), 0)
+			local proj = game.ReplicatedStorage.Classes.SHROOM.Projectile.attack
+			local pc = proj:Clone()
+			pc.Owner.Value = plr
+			pc.Origin.Value = cf.Position
+			pc.CFrame = cf
+			pc.Color = col
+			pc.Speed.Value = pc.Speed.Value
+			pc.ProjectileHandler:Destroy()
+			
+			local function projHandler()
+				local lHits = {}
+				
+				local l__Value__1 = pc;
+				local l__Value__2 = l__Value__1.Origin.Value;
+				
+				game.Debris:AddItem(l__Value__1, 10);
+				l__Value__1.Particle.Color = ColorSequence.new(l__Value__1.Color, l__Value__1.Color);
+				local v5 = game.ReplicatedStorage.Projectiles.limitrange:Clone();
+				v5.CFrame = l__Value__1.CFrame * CFrame.new(0, 0, -l__Value__1.Range.Value);
+				v5.Parent = l__Value__1;
+				local v6 = Instance.new("BodyVelocity", l__Value__1);
+				v6.Velocity = l__Value__1.CFrame.lookVector * l__Value__1.Speed.Value;
+				v6.MaxForce = Vector3.new(math.huge, math.huge, math.huge);
+				local u1 = nil;
+				local function damage(p1, p2)
+					coroutine.resume(coroutine.create(function()
+						u1 = pass();
+						local v7 = game.ReplicatedStorage.Remotes.Damage:InvokeServer(u1, workspace.RealTime.Value, p1, p2);
+					end));
+				end;
+				local u2 = true;
+				local function ended(p8)
+					u2 = false;
+					l__Value__1.Anchored = true;
+					l__Value__1.Particle.Enabled = false;
+					local v9 = 1 - 1;
+					while true do
+						wait(0.01);
+						l__Value__1.Transparency = l__Value__1.Transparency + 0.1;
+						if 0 <= 1 then
+							if v9 < 5 then
+
+							else
+								break;
+							end;
+						elseif 5 < v9 then
+
+						else
+							break;
+						end;
+						v9 = v9 + 1;	
+					end;
+					wait(1);
+					l__Value__1:Destroy();
+					game.Debris:AddItem(l__Value__1, 0.1);
+					game.Debris:AddItem(script, 0.1);
+				end;
+				local l__Value__3 = l__Value__1.Owner.Value;
+				local l__LocalPlayer__4 = game.Players.LocalPlayer;
+				l__Value__1.Touched:connect(function(p9)
+					if p9.Parent ~= nil and (p9.Parent:FindFirstChild("Humanoid") and u2 == true) then
+						local l__Parent__10 = p9.Parent;
+						if l__Parent__10 == l__Value__3.Character then
+							return;
+						end;
+						if l__Parent__10.Stats.CurrentHP.Value <= 0 then
+							return;
+						end;
+						if l__Parent__10.Stats.Safe.Value > 0 then
+							return;
+						end;
+						if l__LocalPlayer__4.Character:FindFirstChild("Team") and l__Parent__10:FindFirstChild("Team") and l__LocalPlayer__4.Character.Team.Value == l__Parent__10.Team.Value then
+							return;
+						end;
+						if l__LocalPlayer__4 == l__Value__3 then
+							if not hits[l__Parent__10] then hits[l__Parent__10] = 0 end
+							
+							if hits[l__Parent__10] < 4 and not lHits[l__Parent__10] then
+								lHits[l__Parent__10] = true
+								
+								hits[l__Parent__10] += 1
+								
+								local l__CFrame__13 = l__Value__1.CFrame;
+								effectapply(l__Parent__10, game.ReplicatedStorage.Classes.SHROOM.Effects.Toxic, l__Parent__10.Head);
+							end
+						end;
+					end;
+					if p9.Name == "limitrange" and p9.Parent == l__Value__1 and u2 == true then
+						ended();
+					end;
+					if p9:FindFirstChild("LobbyWall") and u2 == true then
+						ended();
+					end;
+				end);
+
+								
+			end
+			
+			projHandler()
+			
+			pc.Parent = workspace
+			
+			projRemote:FireServer(proj, cf, col)
+		end
+	end
+end
+
+local a2a = Instance.new("Animation", cgui)
+a2a.AnimationId = "rbxassetid://2033759458"
+a2a = plr.Character.Humanoid:LoadAnimation(a2a)
+
+function attack2()
+	if cds["a2"] == 0 then
+		cooldown("a2", main.Abilites.Ability2)
+		a2a:Play()
+		
+		local plrs = {}
+		
+		for i, pl in pairs(workspace:GetChildren()) do
+			if pl:FindFirstChild'Humanoid' and pl:FindFirstChild'HumanoidRootPart' and pl ~= plr.Character then
+				plrs[pl] = true
+			end
+		end
+		
+		for obj, i in pairs(shooms) do
+			if obj.Anchored then
+				local proj = game.ReplicatedStorage.Classes.SHROOM.Projectile.attack
+				
+				local cd = proj.Range.Value
+				local cp
+				
+				for pl, i in pairs(plrs) do
+					local dist = (pl.HumanoidRootPart.Position - obj.Position).Magnitude
+					
+					if dist < cd then
+						cd = dist
+						cp = pl
+					end
+				end
+				
+				if cp then
+					local cf = CFrame.new(obj.Position, cp.HumanoidRootPart.Position)
+					local pc = proj:Clone()
+					pc.Owner.Value = plr
+					pc.Origin.Value = cf.Position
+					pc.CFrame = cf
+					pc.Color = weaponColor.Value
+					pc.Speed.Value = pc.Speed.Value
+					local ph = pc.ProjectileHandler
+					ph.Projectile.Value = pc
+					ph.Parent = plr.Character
+					
+					local function projHandler()
+						local lHits = {}
+						
+						local l__Value__1 = pc;
+						local l__Value__2 = l__Value__1.Origin.Value;
+						
+						game.Debris:AddItem(l__Value__1, 10);
+						l__Value__1.Particle.Color = ColorSequence.new(l__Value__1.Color, l__Value__1.Color);
+						local v5 = game.ReplicatedStorage.Projectiles.limitrange:Clone();
+						v5.CFrame = l__Value__1.CFrame * CFrame.new(0, 0, -l__Value__1.Range.Value);
+						v5.Parent = l__Value__1;
+						local v6 = Instance.new("BodyVelocity", l__Value__1);
+						v6.Velocity = l__Value__1.CFrame.lookVector * l__Value__1.Speed.Value;
+						v6.MaxForce = Vector3.new(math.huge, math.huge, math.huge);
+						local u1 = nil;
+						local function damage(p1, p2)
+							coroutine.resume(coroutine.create(function()
+								u1 = pass();
+								local v7 = game.ReplicatedStorage.Remotes.Damage:InvokeServer(u1, workspace.RealTime.Value, p1, p2);
+							end));
+						end;
+						local u2 = true;
+						local function ended(p8)
+							u2 = false;
+							l__Value__1.Anchored = true;
+							l__Value__1.Particle.Enabled = false;
+							local v9 = 1 - 1;
+							while true do
+								wait(0.01);
+								l__Value__1.Transparency = l__Value__1.Transparency + 0.1;
+								if 0 <= 1 then
+									if v9 < 5 then
+
+									else
+										break;
+									end;
+								elseif 5 < v9 then
+
+								else
+									break;
+								end;
+								v9 = v9 + 1;	
+							end;
+							wait(1);
+							l__Value__1:Destroy();
+							game.Debris:AddItem(l__Value__1, 0.1);
+							game.Debris:AddItem(script, 0.1);
+						end;
+						local l__Value__3 = l__Value__1.Owner.Value;
+						local l__LocalPlayer__4 = game.Players.LocalPlayer;
+						l__Value__1.Touched:connect(function(p9)
+							if p9.Parent ~= nil and (p9.Parent:FindFirstChild("Humanoid") and u2 == true) then
+								local l__Parent__10 = p9.Parent;
+								if l__Parent__10 == l__Value__3.Character then
+									return;
+								end;
+								if l__Parent__10.Stats.CurrentHP.Value <= 0 then
+									return;
+								end;
+								if l__Parent__10.Stats.Safe.Value > 0 then
+									return;
+								end;
+								if l__LocalPlayer__4.Character:FindFirstChild("Team") and l__Parent__10:FindFirstChild("Team") and l__LocalPlayer__4.Character.Team.Value == l__Parent__10.Team.Value then
+									return;
+								end;
+								if l__LocalPlayer__4 == l__Value__3 then
+									if not lHits[l__Parent__10] then
+										lHits[l__Parent__10] = true
+										
+										for i = 1, 10 do
+											local l__CFrame__13 = l__Value__1.CFrame;
+											effectapply(l__Parent__10, game.ReplicatedStorage.Classes.SHROOM.Effects.Poison, l__Parent__10.Head);
+										end
+									end
+								end;
+							end;
+							if p9.Name == "limitrange" and p9.Parent == l__Value__1 and u2 == true then
+								ended();
+							end;
+							if p9:FindFirstChild("LobbyWall") and u2 == true then
+								ended();
+							end;
+						end);			
+					end
+					
+					projHandler()
+					
+					pc.Parent = workspace
+					
+					projRemote:FireServer(proj, cf, weaponColor.Value)
+				end
+			end
+		end
+	end
+end
+
+local a3a = Instance.new("Animation", cgui)
+a3a.AnimationId = "rbxassetid://2033606768"
+a3a = plr.Character.Humanoid:LoadAnimation(a3a)
+
+function attack3()
+	if cds["a3"] == 0 then
+		cooldown("a3", main.Abilites.Critical)
+		a3a:Play()
+		
+		for i = 1, 15 do
+			local cf = plr.Character.HumanoidRootPart.CFrame * CFrame.new(0, i, 0) * CFrame.Angles(math.rad(math.random(0, 360)), math.rad(math.random(0, 360)), 0)
+			local proj = game.ReplicatedStorage.Classes.SHROOM.Projectile.ability2
+			local pc = proj:Clone()
+			pc.Owner.Value = plr
+			pc.Origin.Value = cf.Position
+			pc.CFrame = cf
+			pc.Color = weaponColor.Value
+			pc.Speed.Value = pc.Speed.Value
+			local ph = pc.ProjectileHandler
+			ph.Projectile.Value = pc
+			ph.Parent = plr.Character
+			
+			pc.Parent = workspace
+			
+			projRemote:FireServer(proj, cf, weaponColor.Value)
+			
+			spawn(function()
+				shooms[pc] = true
+				
+				repeat wait() until not pc.Parent
+				
+				shooms[pc] = nil
+			end)
+			
+			wait()
+		end
+	end
+end
+
+spawn(function()
+	repeat wait() until plr.Character:FindFirstChild'Playing' and plr.Character.Stats.Safe.Value < 1
+	
+	local cld = cds["a3"]
+	
+	cds["a3"] = cdt["a3"]
+	
+	if cld <= 0 then
+		cooldown("a3", main.Abilites.Critical)
+	end
+end)
+
+function reqs(funct)
+	if plr.Character.Stats.Disable.Value ~= 0 then return end
+	if plr.Character.Stats.CurrentHP.Value <= 0 then return end
+	if not plr.PlayerGui:FindFirstChild'ClassGui' then return end
+	if plr.PlayerGui.ClassGui ~= ui then return end
+	
+	funct()
+end
+
+game.Players.LocalPlayer:GetMouse().Button1Down:Connect(function()
+	reqs(attack0)
+end)
+
+game:GetService'UserInputService'.InputBegan:Connect(function(key, typ)
+	if typ then return end
+	
+	if key.KeyCode == Enum.KeyCode.Q then
+		reqs(attack1)
+	end
+	if key.KeyCode == Enum.KeyCode.E then
+		reqs(attack2)
+	end
+	if key.KeyCode == Enum.KeyCode.F then
+		reqs(attack3)
+	end
+end)
+
+main:WaitForChild'Abilites':WaitForChild'Attack'.MouseButton1Click:Connect(function() reqs(attack0) end)
+main:WaitForChild'Abilites':WaitForChild'Ability1'.MouseButton1Click:Connect(function() reqs(attack1) end)
+main:WaitForChild'Abilites':WaitForChild'Ability2'.MouseButton1Click:Connect(function() reqs(attack2) end)
+main:WaitForChild'Abilites':WaitForChild'Critical'.MouseButton1Click:Connect(function() reqs(attack3) end)
+
+repeat wait() until plr.Character:FindFirstChild'Extra'
+
+local originalInfo = {}
+local newInfo = {
+	CName = "NIGGATRON BOSS",
+	Attack = "Mushroom Growth - Creates a mushroom resembling vanilla mushroom's Ability 2.",
+	Ability1 = "Biohazard - Sprays toxic spores around the player, applying up to 4 toxic.",
+	Ability2 = "Spore Destruction - Shoots homing spores towards the nearest players, applying 10 poison each.",
+	Critical = "Mushroom Rain - Grows 15 mushrooms around the player.",
+	Credit = "this isnt even fun to play man"
+}
+
+for i, c in pairs(baseClass.ClassInfo:GetChildren()) do
+	originalInfo[c] = c.Value
+	
+	if newInfo[c.Name] then
+		c.Value = newInfo[c.Name]
+	end
+end
+
+repeat game:GetService'RunService'.Heartbeat:Wait() until not ui.Parent
+
+for i, c in pairs(originalInfo) do
+	i.Value = c
+end
