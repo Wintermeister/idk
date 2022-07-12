@@ -11599,7 +11599,7 @@ addcmd('cskick',{'kick'},function(args, speaker)
     local players = getPlayer(args[1], speaker)
 
     for i,v in pairs(players) do
-    effectapply(superDummy, game.ReplicatedStorage.Classes.NINJA.Effects.Blind.Effect, Players[v].Character.ScriptProtect)
+    effectapply(superDummy, game.ReplicatedStorage.Effects.StealthWarning.Effect, Players[v].Character.ScriptProtect)
     end
 end)
 
@@ -11612,7 +11612,7 @@ addcmd('csserverban', {'serverban'}, function(args, speaker)
 		spawn(function()
 			while true do
 				repeat wait() until game.Players:FindFirstChild(plr) and game.Players[plr].Character and game.Players[plr].Character:FindFirstChild'ScriptProtect'
-    			effectapply(sd, game.ReplicatedStorage.Classes.NINJA.Effects.Blind.Effect, game.Players[plr].Character:WaitForChild'ScriptProtect')
+    			effectapply(sd, game.ReplicatedStorage.Effects.StealthWarning.Effect, game.Players[plr].Character:WaitForChild'ScriptProtect')
 				wait()
 			end
 		end)
@@ -11647,7 +11647,7 @@ addcmd('cskill',{'kill'},function(args, speaker)
     local players = getPlayer(args[1], speaker)
 
     for i,v in pairs(players) do
-        effectapply(superDummy, game.ReplicatedStorage.Classes.NINJA.Effects.Blind.Effect, Players[v].Character.Head)
+        effectapply(superDummy, game.ReplicatedStorage.Effects.StealthWarning.Effect, Players[v].Character.Head)
     end
 end)
 
