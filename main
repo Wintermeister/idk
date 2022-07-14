@@ -3,6 +3,7 @@ if IY_LOADED and not _G.IY_DEBUG == true then
 	return
 end
 
+repeat wait() until game.Players.LocalPlayer.Character
 game.Workspace.AntiMapGlitch.Name = "AntiMapGlitch2"
 local dummymodel = Instance.new("Model",workspace)
 dummymodel.Name = "AntiMapGlitch"
