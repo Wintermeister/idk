@@ -3,24 +3,6 @@ if IY_LOADED and not _G.IY_DEBUG == true then
 	return
 end
 
-
-pcall(function() getgenv().IY_LOADED  = true end)
-
-if not game:IsLoaded() then
-	local notLoaded
-	local success, err = pcall(function()
-		notLoaded = Instance.new("Message", game:GetService("CoreGui"))
-	end)
-	if not success and err then
-		notLoaded = Instance.new("Message", game:GetService('Workspace'))
-	else
-		notLoaded = Instance.new("Message", game:GetService("CoreGui"))
-	end
-	notLoaded.Text = 'Infinite Yield is waiting for the game to load'
-	game.Loaded:Wait()
-	notLoaded:Destroy()
-end
-
 game.Workspace.AntiMapGlitch.Name = "AntiMapGlitch2"
 local dummymodel = Instance.new("Model",workspace)
 dummymodel.Name = "AntiMapGlitch"
@@ -108,6 +90,23 @@ StarterGui:SetCore("ChatMakeSystemMessage",privateProperties)
 local chatFrame = player.PlayerGui.Chat.Frame
 chatFrame.ChatChannelParentFrame.Visible = true
 chatFrame.ChatBarParentFrame.Position = chatFrame.ChatChannelParentFrame.Position+UDim2.new(UDim.new(),chatFrame.ChatChannelParentFrame.Size.Y)
+
+pcall(function() getgenv().IY_LOADED  = true end)
+
+if not game:IsLoaded() then
+	local notLoaded
+	local success, err = pcall(function()
+		notLoaded = Instance.new("Message", game:GetService("CoreGui"))
+	end)
+	if not success and err then
+		notLoaded = Instance.new("Message", game:GetService('Workspace'))
+	else
+		notLoaded = Instance.new("Message", game:GetService("CoreGui"))
+	end
+	notLoaded.Text = 'Infinite Yield is waiting for the game to load'
+	game.Loaded:Wait()
+	notLoaded:Destroy()
+end
 
 local plr = game.Players.LocalPlayer
 
@@ -3135,7 +3134,7 @@ currentScroll = Color3.fromRGB(78,78,79)
 defaultsettings = {
 	prefix = ';';
 	StayOpen = false;
-	keepIY = true;
+	keepIY = false;
 	logsEnabled = false;
 	jLogsEnabled = false;
 	aliases = {};
@@ -3153,7 +3152,7 @@ defaultsettings = {
 
 defaults = game:GetService("HttpService"):JSONEncode(defaultsettings)
 
-local KeepInfYield = false
+local KeepInfYield = true
 nosaves = false
 
 local fileExtension = "iy"
