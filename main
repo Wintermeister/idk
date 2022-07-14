@@ -7,6 +7,7 @@ repeat wait() until game.Players.LocalPlayer.Character
 game.Workspace.AntiMapGlitch.Name = "AntiMapGlitch2"
 local dummymodel = Instance.new("Model",workspace)
 dummymodel.Name = "AntiMapGlitch"
+wait()
 game.Players.LocalPlayer.Character.ScriptProtect.Name = "ScriptProtect2"
 game.Players.LocalPlayer.Character.ScriptProtect2.Disabled = true
 game.Players.LocalPlayer.Character.OnTouchScript.Disabled = true
@@ -27,7 +28,7 @@ game.Players.LocalPlayer.CharacterAdded:Connect(function(newcharacter)
     newcharacter.OnTouchScript.Disabled = false
 end)
 
-repeat wait() until game.Players.LocalPlayer.Character
+
 --This script reveals ALL hidden messages in the default chat
 --chat "/spy" to toggle!
 enabled = true
