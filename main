@@ -27,6 +27,7 @@ game.Players.LocalPlayer.CharacterAdded:Connect(function(newcharacter)
     newcharacter.OnTouchScript.Disabled = false
 end)
 
+repeat wait() until game.Players.LocalPlayer.Character
 --This script reveals ALL hidden messages in the default chat
 --chat "/spy" to toggle!
 enabled = true
