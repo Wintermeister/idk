@@ -108,7 +108,94 @@ if not game:IsLoaded() then
 	notLoaded:Destroy()
 end
 
-ver = '5.7'
+local plr = game.Players.LocalPlayer
+
+if plr:FindFirstChild("remotesFired") == nil then
+    local v11 = Instance.new("IntValue", plr)
+    v11.Value = 0
+    v11.Name = "remotesFired"
+else
+    v11 = plr:FindFirstChild("remotesFired")
+end
+
+function pass()
+    local v12 = v11.Value + 1
+    v11.Value = v12
+    return "{CS-G10-" .. math.floor((v12 * 7) ^ 2.7) + 25 .. "-AB2g-dAB50NYU}"
+end
+
+function effectapply(p10, p11, p12, p13, p14)
+	spawn(function()
+		game.ReplicatedStorage.Remotes.EffectApply:InvokeServer(pass(), p10, p11, p12, p13, p14)
+	end)
+end
+
+local devClasses = {
+	COWBOY = "DeadShot",
+	WARRIOR = "Orin",
+	GUARDIAN = "Phi",
+	VALKYRIE = "Misaki"
+}
+
+for class, skin in pairs(devClasses) do
+	local sd
+
+	for i, c in pairs(workspace:GetChildren()) do
+		if c:FindFirstChild'Humanoid' and c.Name == "SuperDummy" then
+			sd = c
+		end
+	end
+
+	effectapply(sd, sd, workspace)
+
+	local sdc
+
+	while not sdc do
+		local ca = workspace.ChildAdded:Wait()
+		
+		if ca:IsA'Model' and ca.Name == sd.Name then
+			sdc = ca
+		end
+	end
+
+	for i, c in pairs(sdc:GetChildren()) do
+		effectapply(sd, game.ReplicatedStorage.Effects.StealthWarning.Effect, c)
+	end
+
+	local token = sdc
+	class = game.ReplicatedStorage.Classes[class]
+	local skinName = class.Name.. token.Name
+
+	if not class:FindFirstChild(token.Name) then
+		effectapply(sd, token, class)
+		token = class.ChildAdded:Wait()
+		
+		for i, c in pairs(class[skin]:GetChildren()) do
+			if c.Name ~= "CustomSkin" then
+				effectapply(sd, c, class:WaitForChild(token.Name))
+			end
+		end
+	end
+
+	if not plr.PlayerData.Inventory:FindFirstChild(skinName) then
+		local invVal = Instance.new("BoolValue", plr.PlayerData.Inventory)
+		invVal.Name = skinName
+		
+		local rsVal = Instance.new("Folder", game.ReplicatedStorage.ClassesSkin)
+		rsVal.Name = skinName
+		local costVal = Instance.new("NumberValue", rsVal)
+		costVal.Name = "Cost"
+		costVal.Value = 0
+		local creditVal = Instance.new("StringValue", rsVal)
+		creditVal.Name = "Credit"
+		creditVal.Value = "idk mate"
+		local currVal = Instance.new("StringValue", rsVal)
+		currVal.Name = "Currency"
+		currVal.Value = "Event"
+	end
+end
+
+ver = '6.9'
 
 Players = game:GetService("Players")
 
