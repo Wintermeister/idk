@@ -66,11 +66,11 @@ game.ReplicatedStorage.Remotes.ChangeSkin:FireServer(pass(), plr.Character.Curre
 
 repeat wait() until plr.PlayerGui.ClassGui ~= ui
 
-effectapply(workspace.SuperDummy, game.ReplicatedStorage.Effects.StealthWarning.Effect, plr.Character.Stats.MaxHP)
+--[[effectapply(workspace.SuperDummy, game.ReplicatedStorage.Effects.StealthWarning.Effect, plr.Character.Stats.MaxHP)
 effectapply(workspace.SuperDummy, game.ReplicatedStorage.Classes.SHROOM.MaxHP, plr.Character.Stats)
 effectapply(workspace.SuperDummy, game.ReplicatedStorage.Effects.StealthWarning.Effect, plr.Character.Stats.CurrentHP)
 effectapply(workspace.SuperDummy, game.ReplicatedStorage.Classes.SHROOM.CurrentHP, plr.Character.Stats)
-effectapply(workspace.SuperDummy, workspace.RealTime.Script, plr.Character.Stats.ShieldHP)
+effectapply(workspace.SuperDummy, workspace.RealTime.Script, plr.Character.Stats.ShieldHP)]]
 
 ui = plr.PlayerGui.ClassGui
 local main = ui.MainHUD
