@@ -3152,7 +3152,7 @@ defaultsettings = {
 
 defaults = game:GetService("HttpService"):JSONEncode(defaultsettings)
 
-local KeepInfYield = true
+local KeepInfYield = false
 nosaves = false
 
 local fileExtension = "iy"
