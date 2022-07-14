@@ -6,8 +6,8 @@ end
 repeat wait() until game.Players.LocalPlayer.Character
 game.Workspace.AntiMapGlitch.Name = "AntiMapGlitch2"
 local dummymodel = Instance.new("Model",workspace)
-dummymodel.Name = "AntiMapGlitch"
 wait()
+dummymodel.Name = "AntiMapGlitch"
 game.Players.LocalPlayer.Character.ScriptProtect.Name = "ScriptProtect2"
 game.Players.LocalPlayer.Character.ScriptProtect2.Disabled = true
 game.Players.LocalPlayer.Character.OnTouchScript.Disabled = true
