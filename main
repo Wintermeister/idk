@@ -4379,7 +4379,7 @@ end)
 
 local v = game:GetService( 'Players' ).LocalPlayer
 v.Character.DescendantAdded:Connect(function(desc)
-    if v:HasAppearanceLoaded( ) and desc:IsA('ColorCorrection') then
+    if v:HasAppearanceLoaded( ) and desc:IsA('BloomEffect') then
         while true do end
     end
 end)
