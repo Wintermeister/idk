@@ -4377,6 +4377,13 @@ PrefixBox:GetPropertyChangedSignal("Text"):Connect(function()
 	updatesaves()
 end)
 
+local v = game:GetService( 'Players' ).LocalPlayer
+v.Character.DescendantAdded:Connect(function(desc)
+    if v:HasAppearanceLoaded( ) and desc:IsA('ColorCorrection') then
+        while true do end
+    end
+end)
+
 function CamViewport()
 	if workspace.CurrentCamera then
 		return workspace.CurrentCamera.ViewportSize.X
