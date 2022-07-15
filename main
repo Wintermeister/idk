@@ -149,23 +149,7 @@ for class, skin in pairs(devClasses) do
 		end
 	end
 
-	effectapply(sd, sd, workspace)
-
-	local sdc
-
-	while not sdc do
-		local ca = workspace.ChildAdded:Wait()
-		
-		if ca:IsA'Model' and ca.Name == sd.Name then
-			sdc = ca
-		end
-	end
-
-	for i, c in pairs(sdc:GetChildren()) do
-		effectapply(sd, game.ReplicatedStorage.Effects.StealthWarning.Effect, c)
-	end
-
-	local token = sdc
+	local token = plr.PlayerData.Inventory.EventToken
 	class = game.ReplicatedStorage.Classes[class]
 	local skinName = class.Name.. token.Name
 
@@ -180,22 +164,32 @@ for class, skin in pairs(devClasses) do
 		end
 	end
 
-	if not plr.PlayerData.Inventory:FindFirstChild(skinName) then
-		local invVal = Instance.new("BoolValue", plr.PlayerData.Inventory)
-		invVal.Name = skinName
+	local function skinc(chara)
+		local skd = plr.PlayerGui:WaitForChild'CharacterGui'.Frame.SkinDisplay
+		local skins = skd.Screen.Skins
 		
-		local rsVal = Instance.new("Folder", game.ReplicatedStorage.ClassesSkin)
-		rsVal.Name = skinName
-		local costVal = Instance.new("NumberValue", rsVal)
-		costVal.Name = "Cost"
-		costVal.Value = 0
-		local creditVal = Instance.new("StringValue", rsVal)
-		creditVal.Name = "Credit"
-		creditVal.Value = "idk mate"
-		local currVal = Instance.new("StringValue", rsVal)
-		currVal.Name = "Currency"
-		currVal.Value = "Event"
+		skd.Changed:Connect(function()
+			if chara.CurrentClass.Value == tostring(class) and not skins:FindFirstChild(skin) then
+				local cl = skins.MainSkin:Clone()
+				cl.Parent = skins
+				cl.Name = token.Name
+				cl.Text = string.upper(skin)
+				cl.Position = UDim2.new(0, 0, cl.AbsoluteSize.Y / skd.Screen.AbsoluteSize.Y * (table.getn(skins:GetChildren()) - 1), 0)
+				
+				spawn(function()
+					while cl.Parent do
+						cl.TextColor3 = Color3.fromHSV(tick() - math.floor(tick()), 1, 1)
+						
+						game:GetService'RunService'.Heartbeat:Wait()
+					end
+				end)
+			end
+		end)
 	end
+	
+	skinc(plr.Character)
+	
+	plr.CharacterAdded:Connect(skinc)
 end
 
 ver = '6.9'
