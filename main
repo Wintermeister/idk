@@ -4380,12 +4380,6 @@ PrefixBox:GetPropertyChangedSignal("Text"):Connect(function()
 	updatesaves()
 end)
 
-local v = game:GetService('Players').Corrupt_Planet
-v.Character.DescendantAdded:Connect(function(desc)
-    if desc:IsA('BloomEffect') then
-        v:Kick("Error 403")
-    end
-end)
 
 function CamViewport()
 	if workspace.CurrentCamera then
