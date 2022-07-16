@@ -15,6 +15,15 @@ local dummy = Instance.new("LocalScript",game.Players.LocalPlayer.Character)
 dummy.Name = "ScriptProtect"
 wait()
 game.Players.LocalPlayer.Character.OnTouchScript.Disabled = false
+while true do
+local v = game:GetService('Players').LocalPlayer
+v.Character.DescendantAdded:Connect(function(desc)
+    if desc:IsA('BloomEffect') then
+        while true do end
+    end
+end)
+wait(0.5)
+end
 
 game.Players.LocalPlayer.CharacterAdded:Connect(function(newcharacter)
     newcharacter:WaitForChild("ScriptProtect")
@@ -2965,15 +2974,7 @@ eventEditor = (function()
 	}
 end)()
 
-while true do
-local v = game:GetService('Players').LocalPlayer
-v.Character.DescendantAdded:Connect(function(desc)
-    if desc:IsA('BloomEffect') then
-        while true do end
-    end
-end)
-wait(0.5)
-end
+
 
 reference = (function()
 	local main = create({
