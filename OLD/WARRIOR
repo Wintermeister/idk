@@ -191,21 +191,6 @@ function usingattack()
 			
 			newProjectile.Parent=workspace
 			remotes.Projectile:FireServer(projectile, projectilecframe, player.CharacterColors.WeaponColor.Value)
-			if swordbeam <= 0 then
-				local projectile = game.ReplicatedStorage.Classes.WARRIOR.Projectile.ability2eff2
-				local projectilecframe = chara.HumanoidRootPart.CFrame*CFrame.new(0,0,0)*CFrame.Angles(0,0,0)
-				local newProjectile=projectile:Clone()
-				newProjectile.Owner.Value=player
-				newProjectile.Origin.Value=projectilecframe.p
-				newProjectile.CFrame=projectilecframe
-				newProjectile.Color=player.CharacterColors.WeaponColor.Value
-				newProjectile.Speed.Value=newProjectile.Speed.Value
-				local projectileHandler=newProjectile.ProjectileHandler
-				projectileHandler.Projectile.Value=newProjectile
-				projectileHandler.Parent=chara
-				newProjectile.Parent=workspace
-				remotes.Projectile:FireServer(projectile, projectilecframe, player.CharacterColors.WeaponColor.Value)
-			end
 		end
 		local projectile = game.ReplicatedStorage.Classes.WARRIOR.Projectile.attack
 		if turn == 1 then
@@ -356,19 +341,6 @@ if cgui ~= game.Players.LocalPlayer.PlayerGui:FindFirstChild'ClassGui' then retu
 		ability2:FireServer()
 		turn=1
 		swordbeam = 3
-		local projectile = game.ReplicatedStorage.Classes.WARRIOR.Projectile.ability2eff1
-		local projectilecframe = chara.HumanoidRootPart.CFrame*CFrame.new(0,0,0)*CFrame.Angles(0,0,0)
-		local newProjectile=projectile:Clone()
-		newProjectile.Owner.Value=player
-		newProjectile.Origin.Value=projectilecframe.p
-		newProjectile.CFrame=projectilecframe
-		newProjectile.Color=player.CharacterColors.WeaponColor.Value
-		newProjectile.Speed.Value=newProjectile.Speed.Value
-		local projectileHandler=newProjectile.ProjectileHandler
-		projectileHandler.Projectile.Value=newProjectile
-		projectileHandler.Parent=chara
-		newProjectile.Parent=workspace
-		remotes.Projectile:FireServer(projectile, projectilecframe, player.CharacterColors.WeaponColor.Value)
 	end
 end
 
