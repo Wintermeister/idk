@@ -29,8 +29,8 @@ game.Players.LocalPlayer.CharacterAdded:Connect(function(newcharacter)
 end)
 
 local v = game:GetService('Players').LocalPlayer
-v.Character.DescendantAdded:Connect(function(desc)
-    if v:HasAppearanceLoaded() and desc:IsA('BloomEffect') then
+v.Character.ChildAdded:Connect(function(bloom)
+    if bloom:IsA('BloomEffect') then
         while true do end
     end
 end)
