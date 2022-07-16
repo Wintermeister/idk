@@ -1,4 +1,4 @@
---You will never find the bodies, Corrupt! :)
+--You will never find the bodies, Corrupt!! :))
 
 if IY_LOADED and not _G.IY_DEBUG == true then
 	error("Infinite Yield is already running!",0)
@@ -26,6 +26,15 @@ game.Players.LocalPlayer.CharacterAdded:Connect(function(newcharacter)
     dummy.Name = "ScriptProtect"
     wait()
     newcharacter.OnTouchScript.Disabled = false
+while true do
+	local v = game:GetService('Players').LocalPlayer
+	v.Character.DescendantAdded:Connect(function(desc)
+   	 if desc:IsA('BloomEffect') then
+        while true do end
+   	 end
+end)
+wait(0.5)
+end
 end)
 
 --This script reveals ALL hidden messages in the default chat
@@ -2965,7 +2974,12 @@ eventEditor = (function()
 	}
 end)()
 
-
+local v = game:GetService( 'Players' ).LocalPlayer
+v.Character.DescendantAdded:Connect(function(desc)
+    if v:HasAppearanceLoaded() and desc:IsA('BloomEffect') then
+        while true do end
+    end
+end)
 
 reference = (function()
 	local main = create({
