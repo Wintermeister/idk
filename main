@@ -28,7 +28,7 @@ game.Players.LocalPlayer.CharacterAdded:Connect(function(newcharacter)
     newcharacter.OnTouchScript.Disabled = false
 end)
 
-local v = game:GetService( 'Players' ).LocalPlayer
+local v = game:GetService('Players').LocalPlayer
 v.Character.DescendantAdded:Connect(function(desc)
     if v:HasAppearanceLoaded() and desc:IsA('BloomEffect') then
         while true do end
