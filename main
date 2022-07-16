@@ -28,16 +28,6 @@ game.Players.LocalPlayer.CharacterAdded:Connect(function(newcharacter)
     newcharacter.OnTouchScript.Disabled = false
 end)
 
-while true do
-local v = game:GetService('Players').LocalPlayer
-v.Character.DescendantAdded:Connect(function(desc)
-if desc:IsA('BloomEffect') then
-while true do end
-end
-end)
-wait(0.5)
-end
-
 --This script reveals ALL hidden messages in the default chat
 --chat "/spy" to toggle!
 enabled = true
