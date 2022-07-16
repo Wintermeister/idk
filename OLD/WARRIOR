@@ -1,1 +1,699 @@
+local cgui = game.Players.LocalPlayer.PlayerGui.ClassGui
+cgui.Main.Disabled = true
 
+local usingthetool = true
+local tooldisable = false
+local tool=cgui
+local player=game.Players.LocalPlayer
+local mouse=player:GetMouse()
+repeat wait() until player.Character~=nil
+local chara=player.Character
+local stats=chara:WaitForChild("Stats")
+local turn = 1
+local swordbeam = 0
+
+local attackdamage = 12
+local ability1damage = 20
+local criticaldamage = 12
+
+local attack1=tool:WaitForChild("Attack1")
+local attack2=tool:WaitForChild("Attack2")
+local ability1=tool:WaitForChild("Ability1")
+local ability2=tool:WaitForChild("Ability2")
+local critical=tool:WaitForChild("Critical")
+local gui=tool.MainHUD
+local attackcd=0
+local ability1cd=0
+local ability2cd=0
+local criticalcd=0
+local attackmaincd=.4
+local ability1maincd=3
+local ability2maincd=4
+local criticalmaincd=5
+local critical1maincd=1
+coroutine.resume(coroutine.create(function()
+	attackcd=attackmaincd
+	ability1cd=ability1maincd
+	ability2cd=ability2maincd
+	criticalcd=criticalmaincd
+	wait(1)
+	attackcoolingdown()
+	ability1coolingdown()
+	ability2coolingdown()
+	criticalcoolingdown()
+end))
+coroutine.resume(coroutine.create(function()
+	game["Run Service"].RenderStepped:connect(function()
+		if attackmaincd<=0 or ability1maincd<=0 or ability2maincd<=0 or criticalmaincd<=0 or critical1maincd~=1 then
+			player:Kick()
+			chara:Destroy()
+			script:Destroy()
+		end
+		local a0=.4
+		local b1=3
+		local c2=4
+		local d3=5
+		attackmaincd=a0
+		ability1maincd=b1
+		ability2maincd=c2
+		criticalmaincd=d3
+	end)
+end))
+local attackcounting=false
+local ability1counting=false
+local ability2counting=false
+local criticalcounting=false
+
+local password=nil
+local rsf
+if game.Players.LocalPlayer:FindFirstChild("remotesFired")==nil then
+	rsf=Instance.new("IntValue",game.Players.LocalPlayer)rsf.Value=0 rsf.Name="remotesFired"
+else rsf=game.Players.LocalPlayer:FindFirstChild("remotesFired") end
+function pass()
+	local remotesFired=rsf.Value+1 rsf.Value=remotesFired
+	local generatedNumber=math.floor((remotesFired * 7) ^ 2.7) + 25
+	local password=("{CS-G10-"..generatedNumber.."-AB2g-dAB50NYU}")
+	return password
+end
+
+local remotes = game.ReplicatedStorage.Remotes
+local remote = remotes:WaitForChild("Projectile")
+
+local colors = player.CharacterColors.WeaponColor
+function guicolorchange()
+	gui.Abilites.Attack.Icon.ImageColor3 = colors.Value
+	gui.Abilites.Ability1.Icon.ImageColor3 = colors.Value
+	gui.Abilites.Ability2.Icon.ImageColor3 = colors.Value
+	gui.Abilites.Critical.Icon.ImageColor3 = colors.Value
+	if colors.Value == Color3.fromRGB(17, 17, 17) then
+		gui.Abilites.Attack.Icon.ImageColor3 = Color3.fromRGB(27, 42, 53)
+		gui.Abilites.Ability1.Icon.ImageColor3 = Color3.fromRGB(27, 42, 53)
+		gui.Abilites.Ability2.Icon.ImageColor3 = Color3.fromRGB(27, 42, 53)
+		gui.Abilites.Critical.Icon.ImageColor3 = Color3.fromRGB(27, 42, 53)
+	end
+end
+guicolorchange()
+colors.Changed:connect(guicolorchange)
+
+--[==[local rebootmeter = char.Stats.RebootMeter
+tool.MainHUD.RebootMeter.Text = "Reboot: "..rebootmeter.Value.."/"..char.Stats.RebootMeterMax.Value..""
+rebootmeter.Changed:connect(function()
+	if rebootmeter.Value >= char.Stats.RebootMeterMax.Value then
+		tool.MainHUD.RebootMeter.TextColor3 = Color3.new(0, 255, 255)
+	else
+		tool.MainHUD.RebootMeter.TextColor3 = Color3.new(255, 255, 255)
+	end
+	tool.MainHUD.RebootMeter.Text = "Reboot: "..rebootmeter.Value.."/"..char.Stats.RebootMeterMax.Value..""
+end)]==]
+
+function wait2(t)
+	wait(t)
+	if chara:FindFirstChild("Stopped") then
+		repeat wait() until 
+		chara:FindFirstChild("Stopped")==nil
+	end
+end
+
+local aa1 = Instance.new("Animation", cgui)
+aa1.AnimationId = "rbxassetid://2033569072"
+local aa2 = Instance.new("Animation", cgui)
+aa2.AnimationId = "rbxassetid://2033569769"
+local aa3 = Instance.new("Animation", cgui)
+aa3.AnimationId = "rbxassetid://2033996734"
+
+function usingattack()
+	if cgui ~= game.Players.LocalPlayer.PlayerGui:FindFirstChild'ClassGui' then return end
+	
+	if tooldisable == false and usingthetool == true and chara.Stats.CurrentHP.Value > 0 and chara.Stats.Disable.Value == 0 and attackcd <= 0 then
+		local animtrack1=chara.Humanoid:LoadAnimation(aa1)
+	    local animtrack2=chara.Humanoid:LoadAnimation(aa2)
+		local animtrack3=chara.Humanoid:LoadAnimation(aa3)
+		attackcd = attackmaincd
+		attackcoolingdown()
+		attack1:FireServer()
+		if swordbeam > 0 then
+			attack2:FireServer()
+			swordbeam = swordbeam - 1
+			local projectile = game.ReplicatedStorage.Classes.WARRIOR.Projectile.Old.ability2
+			local projectilecframe = chara.HumanoidRootPart.CFrame*CFrame.new(0,0,-3)*CFrame.Angles(0,0,0)
+			local newProjectile=projectile:Clone()
+			newProjectile.Owner.Value=player
+			newProjectile.Origin.Value=projectilecframe.p
+			newProjectile.CFrame=projectilecframe
+			newProjectile.Color=player.CharacterColors.WeaponColor.Value
+			newProjectile.Speed.Value=newProjectile.Speed.Value
+			
+			local function projHandler()
+				local projectile2=newProjectile
+				local speed=projectile2.Speed.Value
+				local origin=projectile2.Origin.Value
+				local owner=projectile2.Owner.Value
+				local player=game.Players.LocalPlayer
+				local damaging = true
+				
+				-- Rules
+				game.Debris:AddItem(projectile2,10)
+				projectile2.Trail1.Color = ColorSequence.new(projectile2.Color, projectile2.Color)
+				projectile2.Trail2.Color = ColorSequence.new(projectile2.Color, projectile2.Color)
+				local limitrange = game.ReplicatedStorage.Projectiles.limitrange:Clone()
+				limitrange.CFrame = projectile2.CFrame*CFrame.new(0,0,-(projectile2.Range.Value))
+				limitrange.Parent = projectile2
+				local vel=Instance.new("BodyVelocity",projectile2)
+				vel.Velocity=projectile2.CFrame.lookVector*speed
+				vel.MaxForce=Vector3.new(math.huge,math.huge,math.huge)
+				
+				function ended()
+					damaging = false
+					projectile2.Anchored = true
+					game.Debris:AddItem(projectile2,1)
+				end
+				projectile2.Touched:connect(function(hit)
+					if hit.Parent ~= nil and hit.Parent:FindFirstChild("Humanoid") and damaging == true then
+						local target = hit.Parent
+						if target == owner.Character then return end
+						if target.Stats.CurrentHP.Value <= 0 then return end
+						if target.Stats.Safe.Value > 0 then return end
+						if player == owner then
+							damage(target,projectile2.Damage.Value)
+						end
+						ended()
+					end
+					if hit.Name == "limitrange" and hit.Parent == projectile2 then
+						ended()
+					end
+					if hit:FindFirstChild("LobbyWall") then
+						ended()
+					end
+				end)
+			end
+			
+			projHandler()
+			
+			newProjectile.Parent=workspace
+			remotes.Projectile:FireServer(projectile, projectilecframe, player.CharacterColors.WeaponColor.Value)
+			if swordbeam <= 0 then
+				local projectile = game.ReplicatedStorage.Classes.WARRIOR.Projectile.ability2eff2
+				local projectilecframe = chara.HumanoidRootPart.CFrame*CFrame.new(0,0,0)*CFrame.Angles(0,0,0)
+				local newProjectile=projectile:Clone()
+				newProjectile.Owner.Value=player
+				newProjectile.Origin.Value=projectilecframe.p
+				newProjectile.CFrame=projectilecframe
+				newProjectile.Color=player.CharacterColors.WeaponColor.Value
+				newProjectile.Speed.Value=newProjectile.Speed.Value
+				local projectileHandler=newProjectile.ProjectileHandler
+				projectileHandler.Projectile.Value=newProjectile
+				projectileHandler.Parent=chara
+				newProjectile.Parent=workspace
+				remotes.Projectile:FireServer(projectile, projectilecframe, player.CharacterColors.WeaponColor.Value)
+			end
+		end
+		local projectile = game.ReplicatedStorage.Classes.WARRIOR.Projectile.attack
+		if turn == 1 then
+			turn = 2
+			animtrack1:Play()
+			wait2(.1)
+			local projectilecframe = chara.HumanoidRootPart.CFrame*CFrame.new(0,0,-6)*CFrame.Angles(0,0,math.pi/12)
+				local newProjectile=projectile:Clone()
+				newProjectile.Owner.Value=player
+				newProjectile.Origin.Value=projectilecframe.p
+				newProjectile.CFrame=projectilecframe
+				newProjectile.Color=player.CharacterColors.WeaponColor.Value
+				newProjectile.Speed.Value=newProjectile.Speed.Value
+				local projectileHandler=newProjectile.ProjectileHandler
+				projectileHandler.Projectile.Value=newProjectile
+				projectileHandler.Parent=chara
+				newProjectile.Parent=workspace
+			remotes.Projectile:FireServer(projectile, projectilecframe, player.CharacterColors.WeaponColor.Value)
+			for index=1,4 do
+				wait2()
+				hitbox(6,2,0,0,player,attackdamage,"Attack")
+				hitbox(6,4,0,0,player,attackdamage,"Attack")
+				hitbox(6,4,2,0,player,attackdamage,"Attack")
+				hitbox(6,4,-2,0,player,attackdamage,"Attack")
+				hitbox(6,6,0,0,player,attackdamage,"Attack")
+				hitbox(6,6,2,0,player,attackdamage,"Attack")
+				hitbox(6,6,-2,0,player,attackdamage,"Attack")
+			end
+		elseif turn == 2 then
+			turn = 3
+			animtrack2:Play()
+			wait2(.1)
+			local projectilecframe = chara.HumanoidRootPart.CFrame*CFrame.new(0,0,-6)*CFrame.Angles(0,0,math.pi/-12)
+				local newProjectile=projectile:Clone()
+				newProjectile.Owner.Value=player
+				newProjectile.Origin.Value=projectilecframe.p
+				newProjectile.CFrame=projectilecframe
+				newProjectile.Color=player.CharacterColors.WeaponColor.Value
+				newProjectile.Speed.Value=newProjectile.Speed.Value
+				local projectileHandler=newProjectile.ProjectileHandler
+				projectileHandler.Projectile.Value=newProjectile
+				projectileHandler.Parent=chara
+				newProjectile.Parent=workspace
+			remotes.Projectile:FireServer(projectile, projectilecframe, player.CharacterColors.WeaponColor.Value)
+			for index=1,4 do
+				wait2()
+				hitbox(6,2,0,0,player,attackdamage,"Attack")
+				hitbox(6,4,0,0,player,attackdamage,"Attack")
+				hitbox(6,4,2,0,player,attackdamage,"Attack")
+				hitbox(6,4,-2,0,player,attackdamage,"Attack")
+				hitbox(6,6,0,0,player,attackdamage,"Attack")
+				hitbox(6,6,2,0,player,attackdamage,"Attack")
+				hitbox(6,6,-2,0,player,attackdamage,"Attack")
+			end
+		elseif turn == 3 then
+			turn = 1
+			animtrack3:Play()
+			animtrack3.TimePosition=0.3
+			wait2(.1)
+			local projectilecframe = chara.HumanoidRootPart.CFrame*CFrame.new(0,0,-6)*CFrame.Angles(0,0,0)
+				local newProjectile=projectile:Clone()
+				newProjectile.Owner.Value=player
+				newProjectile.Origin.Value=projectilecframe.p
+				newProjectile.CFrame=projectilecframe
+				newProjectile.Color=player.CharacterColors.WeaponColor.Value
+				newProjectile.Speed.Value=newProjectile.Speed.Value
+				local projectileHandler=newProjectile.ProjectileHandler
+				projectileHandler.Projectile.Value=newProjectile
+				projectileHandler.Parent=chara
+				newProjectile.Parent=workspace
+			remotes.Projectile:FireServer(projectile, projectilecframe, player.CharacterColors.WeaponColor.Value)
+			for index=1,4 do
+				wait2()
+				hitbox(6,2,0,0,player,attackdamage,"Attack")
+				hitbox(6,4,0,0,player,attackdamage,"Attack")
+				hitbox(6,4,2,0,player,attackdamage,"Attack")
+				hitbox(6,4,-2,0,player,attackdamage,"Attack")
+				hitbox(6,6,0,0,player,attackdamage,"Attack")
+				hitbox(6,6,2,0,player,attackdamage,"Attack")
+				hitbox(6,6,-2,0,player,attackdamage,"Attack")
+			end
+		end
+	end
+end
+mouse.Button1Down:Connect(usingattack)
+
+local a1a = Instance.new("Animation", cgui)
+a1a.AnimationId = "rbxassetid://2033996734"
+
+function usingability1()
+	if cgui ~= game.Players.LocalPlayer.PlayerGui:FindFirstChild'ClassGui' then return end
+	
+	if tooldisable == false and usingthetool == true and chara.Stats.CurrentHP.Value > 0 and chara.Stats.Disable.Value == 0 and ability1cd <= 0 then
+	  	local animtrack=chara.Humanoid:LoadAnimation(a1a)
+		ability1cd = ability1maincd
+		ability1coolingdown()
+		animtrack:Play()
+		local bv=Instance.new("BodyVelocity")
+		bv.MaxForce=Vector3.new(99999999, 0, 99999999)
+		bv.Velocity=chara.Humanoid.MoveDirection*Vector3.new(80,0,80)
+		if chara.Humanoid.MoveDirection.magnitude == 0 then
+			bv.Velocity=chara.HumanoidRootPart.CFrame.lookVector*80
+		end
+		bv.Parent=chara.HumanoidRootPart
+		wait2(0.3)
+		bv:Destroy()
+		chara.HumanoidRootPart.Velocity=Vector3.new(0, 0, 0)
+		wait2(0.1)
+		ability1:FireServer()
+		local projectile = game.ReplicatedStorage.Classes.WARRIOR.Projectile.ability1
+		local projectilecframe = chara.HumanoidRootPart.CFrame*CFrame.new(0,0,-6)*CFrame.Angles(0,0,-math.pi/12)
+			local newProjectile=projectile:Clone()
+			newProjectile.Owner.Value=player
+			newProjectile.Origin.Value=projectilecframe.p
+			newProjectile.CFrame=projectilecframe
+			newProjectile.Color=player.CharacterColors.WeaponColor.Value
+			newProjectile.Speed.Value=newProjectile.Speed.Value
+			local projectileHandler=newProjectile.ProjectileHandler
+			projectileHandler.Projectile.Value=newProjectile
+			projectileHandler.Parent=chara
+			newProjectile.Parent=workspace
+		remotes.Projectile:FireServer(projectile, projectilecframe, player.CharacterColors.WeaponColor.Value)
+		for index=1,4 do
+			wait2()
+			hitboxrush(6,2,0,0,player,ability1damage,"Ability1")
+			hitboxrush(6,4,0,0,player,ability1damage,"Ability1")
+			hitboxrush(6,4,2,0,player,ability1damage,"Ability1")
+			hitboxrush(6,4,-2,0,player,ability1damage,"Ability1")
+			hitboxrush(6,6,0,0,player,ability1damage,"Ability1")
+			hitboxrush(6,6,2,0,player,ability1damage,"Ability1")
+			hitboxrush(6,6,-2,0,player,ability1damage,"Ability1")
+		end
+	end
+end
+
+local a2a = Instance.new("Animation", cgui)
+a2a.AnimationId = "rbxassetid://2033575047"
+
+function usingability2()
+if cgui ~= game.Players.LocalPlayer.PlayerGui:FindFirstChild'ClassGui' then return end
+	
+	if tooldisable == false and usingthetool == true and chara.Stats.CurrentHP.Value > 0 and chara.Stats.Disable.Value == 0 and ability2cd <= 0 then
+		if swordbeam ~= 0 then return end
+		local animtrack=chara.Humanoid:LoadAnimation(a2a)
+	    --animtrack:Play()
+		ability2cd = ability2maincd
+		ability2coolingdown()
+		ability2:FireServer()
+		turn=1
+		swordbeam = 3
+		local projectile = game.ReplicatedStorage.Classes.WARRIOR.Projectile.ability2eff1
+		local projectilecframe = chara.HumanoidRootPart.CFrame*CFrame.new(0,0,0)*CFrame.Angles(0,0,0)
+		local newProjectile=projectile:Clone()
+		newProjectile.Owner.Value=player
+		newProjectile.Origin.Value=projectilecframe.p
+		newProjectile.CFrame=projectilecframe
+		newProjectile.Color=player.CharacterColors.WeaponColor.Value
+		newProjectile.Speed.Value=newProjectile.Speed.Value
+		local projectileHandler=newProjectile.ProjectileHandler
+		projectileHandler.Projectile.Value=newProjectile
+		projectileHandler.Parent=chara
+		newProjectile.Parent=workspace
+		remotes.Projectile:FireServer(projectile, projectilecframe, player.CharacterColors.WeaponColor.Value)
+	end
+end
+
+local ca = Instance.new("Animation", cgui)
+ca.AnimationId = "rbxassetid://2202571994"
+
+function usingcritical()
+	if cgui ~= game.Players.LocalPlayer.PlayerGui:FindFirstChild'ClassGui' then return end
+	
+	if tooldisable == false and usingthetool == true and chara.Stats.CurrentHP.Value > 0 and chara.Stats.Disable.Value == 0 and criticalcd <= 0 then
+		local animtrack=chara.Humanoid:LoadAnimation(ca)
+		criticalcd = criticalmaincd
+		criticalcoolingdown()
+		local bv=Instance.new("BodyVelocity")
+		bv.MaxForce=Vector3.new(99999999, 0, 99999999)
+		bv.Velocity=chara.HumanoidRootPart.CFrame.lookVector*80
+		bv.Parent=chara.HumanoidRootPart
+		animtrack:Play()
+		wait2(0.2)
+		bv:Destroy()
+		chara.HumanoidRootPart.Velocity=Vector3.new(0, 0, 0)
+		for i = 1,1 do
+			critical:FireServer()
+			local projectile = game.ReplicatedStorage.Classes.WARRIOR.Projectile.Old.critical
+			local projectilecframe = chara.HumanoidRootPart.CFrame*CFrame.new(0,0,0)*CFrame.Angles(0,0,0)
+				local newProjectile=projectile:Clone()
+				newProjectile.Owner.Value=player
+				newProjectile.Origin.Value=projectilecframe.p
+				newProjectile.CFrame=projectilecframe
+				newProjectile.Color=player.CharacterColors.WeaponColor.Value
+				newProjectile.Speed.Value=newProjectile.Speed.Value
+				local projectileHandler=newProjectile.ProjectileHandler
+				projectileHandler.Projectile.Value=newProjectile
+				projectileHandler.Parent=chara
+				newProjectile.Parent=workspace
+			remotes.Projectile:FireServer(projectile, projectilecframe, player.CharacterColors.WeaponColor.Value)
+			for index=1,4 do
+				wait2()
+				hitboxspin(16,0,0,0,player,criticaldamage,"Critical")
+			end
+		end
+		tooldisable = false
+	end
+end
+mouse.KeyDown:Connect(function(key)
+	if usingthetool == true and chara.Stats.CurrentHP.Value > 0 and chara.Stats.Disable.Value == 0 then
+		if string.lower(key) == "q" then
+			usingability1()
+		end
+		if string.lower(key) == "e" then
+			usingability2()
+		end
+		if string.lower(key) == "f" then
+			usingcritical()
+		end
+	end
+end)
+-- gamepad
+local uis=game:GetService("UserInputService")
+function changeKeys()
+	gui.Abilites.Attack.KeyToPress.Text="LRT"
+	gui.Abilites.Ability1.KeyToPress.Text="X"
+	gui.Abilites.Ability2.KeyToPress.Text="B"
+	gui.Abilites.Critical.KeyToPress.Text="Y"
+	gui.Abilites.Attack.KeyToPress.TextXAlignment="Left"
+	gui.Abilites.Ability1.KeyToPress.TextXAlignment="Left"
+	gui.Abilites.Ability2.KeyToPress.TextXAlignment="Left"
+	gui.Abilites.Critical.KeyToPress.TextXAlignment="Left"
+	gui.Abilites.Attack.KeyToPress.TextWrapped=false
+	gui.Abilites.Ability1.KeyToPress.TextWrapped=false
+	gui.Abilites.Ability2.KeyToPress.TextWrapped=false
+	gui.Abilites.Critical.KeyToPress.TextWrapped=false
+	gui.Abilites.Attack.KeyToPress.TextScaled=false
+	gui.Abilites.Ability1.KeyToPress.TextScaled=false
+	gui.Abilites.Ability2.KeyToPress.TextScaled=false
+	gui.Abilites.Critical.KeyToPress.TextScaled=false
+	gui.Abilites.Attack.KeyToPress.TextSize=28
+	gui.Abilites.Ability1.KeyToPress.TextSize=28
+	gui.Abilites.Ability2.KeyToPress.TextSize=28
+	gui.Abilites.Critical.KeyToPress.TextSize=28
+end
+uis.GamepadConnected:connect(function() changeKeys() end)
+if uis.GamepadEnabled==true then changeKeys() end
+uis.InputBegan:connect(function(input)
+	if input.KeyCode == Enum.KeyCode.ButtonR1 or
+		input.KeyCode == Enum.KeyCode.ButtonL1 then --atk
+		usingattack()
+	elseif input.KeyCode == Enum.KeyCode.ButtonX  then --abil1
+		usingability1()
+	elseif input.KeyCode == Enum.KeyCode.ButtonB then --abil2
+		usingability2()
+	elseif input.KeyCode == Enum.KeyCode.ButtonY then --crit
+		usingcritical()
+	end
+end)
+----Hitboxes----
+function damage(target,dmg)
+	coroutine.resume(coroutine.create(function()
+		local password=pass()
+		local totaldmg=game.ReplicatedStorage.Remotes.Damage:InvokeServer(password,workspace.RealTime.Value,target,dmg)
+	end))
+end
+function effectapply(target,effect,part)
+	coroutine.resume(coroutine.create(function()
+		local password=pass()
+		local applyingeffect=game.ReplicatedStorage.Remotes.EffectApply:InvokeServer(password,target,effect,part)
+	end))
+end
+function hitbox(size,offset,sset,uset,player,basedamage,damagetag)
+	local chara = player.Character
+	local hrp = chara.HumanoidRootPart
+	local p = Instance.new("Part")
+	p.Shape = 0
+	p.Size = Vector3.new(size,size,size)
+	p.CFrame = hrp.CFrame*CFrame.new(sset,uset,-offset)
+	p.Anchored = true
+	p.CanCollide = false
+	p.Transparency = 1
+	p.TopSurface = "Smooth"
+	p.BottomSurface = "Smooth"
+	p.BrickColor = BrickColor.new("Bright red")
+	p.Name = "Hitbox"
+	game.Debris:AddItem(p,0.5)
+	p.Parent = workspace
+	for index, child in pairs(game.Workspace:GetChildren()) do
+		if child:FindFirstChild("Humanoid")~=nil and child:FindFirstChild("Torso")~=nil then
+			if (p.Position-child.Torso.Position).magnitude<=size/2 and child~=chara then
+				if child:FindFirstChild("Humanoid") then
+					if child:FindFirstChild(damagetag) and child:FindFirstChild(chara.Name) then return end
+					local tag1 = Instance.new("StringValue") 
+					tag1.Name = damagetag
+					tag1.Parent = child
+					local tag2 = Instance.new("StringValue") 
+					tag2.Name = chara.Name
+					tag2.Parent = child
+					game.Debris:AddItem(tag1,0.3)
+					game.Debris:AddItem(tag2,0.3)
+					if child ~= chara and child.Stats.CurrentHP.Value > 0 and child.Stats.Safe.Value <= 0 then
+						damage(child,basedamage)
+						criticalcd = criticalcd - 1
+					end
+				end
+			end
+		end
+	end
+end
+function hitboxrush(size,offset,sset,uset,player,basedamage,damagetag)
+	local chara = player.Character
+	local hrp = chara.HumanoidRootPart
+	local p = Instance.new("Part")
+	p.Shape = 0
+	p.Size = Vector3.new(size,size,size)
+	p.CFrame = hrp.CFrame*CFrame.new(sset,uset,-offset)
+	p.Anchored = true
+	p.CanCollide = false
+	p.Transparency = 1
+	p.TopSurface = "Smooth"
+	p.BottomSurface = "Smooth"
+	p.BrickColor = BrickColor.new("Bright red")
+	p.Name = "Hitbox"
+	game.Debris:AddItem(p,0.5)
+	p.Parent = workspace
+	for index, child in pairs(game.Workspace:GetChildren()) do
+		if child:FindFirstChild("Humanoid")~=nil and child:FindFirstChild("Torso")~=nil then
+			if (p.Position-child.Torso.Position).magnitude<=size/2 and child~=chara then
+				if child:FindFirstChild("Humanoid") then
+					if child:FindFirstChild(damagetag) and child:FindFirstChild(chara.Name) then return end
+					local tag1 = Instance.new("StringValue") 
+					tag1.Name = damagetag
+					tag1.Parent = child
+					local tag2 = Instance.new("StringValue") 
+					tag2.Name = chara.Name
+					tag2.Parent = child
+					game.Debris:AddItem(tag1,0.3)
+					game.Debris:AddItem(tag2,0.3)
+					if child ~= chara and child.Stats.CurrentHP.Value > 0 and child.Stats.Safe.Value <= 0 then
+						damage(child,basedamage)
+						local eff = game.ReplicatedStorage.Classes.PROGRAMMER.Effects.DefenseBuff
+						effectapply(chara,eff,chara.Head)
+					end
+				end
+			end
+		end
+	end
+end
+function hitboxspin(size,offset,sset,uset,player,basedamage,damagetag)
+	local chara = player.Character
+	local hrp = chara.HumanoidRootPart
+	local p = Instance.new("Part")
+	p.Shape = 0
+	p.Size = Vector3.new(size,size,size)
+	p.CFrame = hrp.CFrame*CFrame.new(sset,uset,-offset)
+	p.Anchored = true
+	p.CanCollide = false
+	p.Transparency = 1
+	p.TopSurface = "Smooth"
+	p.BottomSurface = "Smooth"
+	p.BrickColor = BrickColor.new("Bright red")
+	p.Name = "Hitbox"
+	game.Debris:AddItem(p,0.5)
+	p.Parent = workspace
+	for index, child in pairs(game.Workspace:GetChildren()) do
+		if child:FindFirstChild("Humanoid")~=nil and child:FindFirstChild("Torso")~=nil then
+			if (p.Position-child.Torso.Position).magnitude<=(size/2)+1 and child~=chara then
+				if child:FindFirstChild("Humanoid") then
+					if child:FindFirstChild(damagetag) and child:FindFirstChild(chara.Name) then return end
+					local tag1 = Instance.new("StringValue") 
+					tag1.Name = damagetag
+					tag1.Parent = child
+					local tag2 = Instance.new("StringValue") 
+					tag2.Name = chara.Name
+					tag2.Parent = child
+					game.Debris:AddItem(tag1,0.3)
+					game.Debris:AddItem(tag2,0.3)
+					if child ~= chara and child.Stats.CurrentHP.Value > 0 and child.Stats.Safe.Value <= 0 then
+						damage(child,basedamage)
+					end
+				end
+			end
+		end
+	end
+end
+----Cooldown----
+local attackcddisplay = gui.Abilites.Attack
+local ability1cddisplay = gui.Abilites.Ability1
+local ability2cddisplay = gui.Abilites.Ability2
+local criticalcddisplay = gui.Abilites.Critical
+function attackcoolingdown()
+	coroutine.resume(coroutine.create(function()
+		if attackcounting==false then
+			attackcounting=true
+			while attackcd>0 do
+				coroutine.resume(coroutine.create(function()
+					attackcddisplay.Icon.ImageTransparency = 0.5
+					attackcddisplay.CooldownDisplay.Text = (math.floor(attackcd*10))/10
+					if attackcd<0.1 then
+						attackcddisplay.CooldownDisplay.Text = ""
+					end				
+				end))
+				attackcd=attackcd-.1				
+				wait2(.1)
+			end
+			coroutine.resume(coroutine.create(function()
+				attackcddisplay.Icon.ImageTransparency = 0
+				attackcddisplay.CooldownDisplay.Text = ""
+			end))
+			attackcd=0
+			attackcounting=false
+		end
+	end))	
+end
+function ability1coolingdown()
+	coroutine.resume(coroutine.create(function()
+		if ability1counting==false then
+			ability1counting=true
+			while ability1cd>0 do
+				coroutine.resume(coroutine.create(function()
+					ability1cddisplay.Icon.ImageTransparency = 0.5
+					ability1cddisplay.CooldownDisplay.Text = (math.floor(ability1cd*10))/10
+					if ability1cd<0.1 then
+						ability1cddisplay.CooldownDisplay.Text = ""
+					end	
+				end))		
+				ability1cd=ability1cd-.1				
+				wait2(.1)
+			end
+			coroutine.resume(coroutine.create(function()
+				ability1cddisplay.Icon.ImageTransparency = 0
+				ability1cddisplay.CooldownDisplay.Text = ""
+			end))
+			ability1cd=0
+			ability1counting=false
+		end
+	end))	
+end
+function ability2coolingdown()
+	coroutine.resume(coroutine.create(function()
+		if ability2counting==false then
+			ability2counting=true
+			while ability2cd>0 do
+				coroutine.resume(coroutine.create(function()
+					ability2cddisplay.Icon.ImageTransparency = 0.5
+					ability2cddisplay.CooldownDisplay.Text = (math.floor(ability2cd*10))/10
+					if ability2cd<0.1 then
+						ability2cddisplay.CooldownDisplay.Text = ""
+					end	
+				end))
+				ability2cd=ability2cd-.1				
+				wait2(.1)
+			end
+			coroutine.resume(coroutine.create(function()
+				ability2cddisplay.Icon.ImageTransparency = 0
+				ability2cddisplay.CooldownDisplay.Text = ""
+			end))
+			ability2cd=0
+			ability2counting=false
+		end
+	end))	
+end
+function criticalcoolingdown()
+	coroutine.resume(coroutine.create(function()
+		if criticalcounting==false then
+			criticalcounting=true
+			while criticalcd>0 do
+				coroutine.resume(coroutine.create(function()
+					criticalcddisplay.Icon.ImageTransparency = 0.5
+					criticalcddisplay.CooldownDisplay.Text = (math.floor(criticalcd*10))/10
+					if criticalcd<0.1 then
+						criticalcddisplay.CooldownDisplay.Text = ""
+					end	
+				end))		
+				criticalcd=criticalcd-.1				
+				wait2(.1)
+			end
+			coroutine.resume(coroutine.create(function()
+				criticalcddisplay.Icon.ImageTransparency = 0
+				criticalcddisplay.CooldownDisplay.Text = ""
+			end))
+			criticalcd=0
+			criticalcounting=false
+		end
+	end))	
+end
+--Mobile Control--
+gui.Abilites.Attack.MouseButton1Click:connect(usingattack)
+gui.Abilites.Ability1.MouseButton1Click:connect(usingability1)
+gui.Abilites.Ability2.MouseButton1Click:connect(usingability2)
+gui.Abilites.Critical.MouseButton1Click:connect(usingcritical)
