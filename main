@@ -12078,6 +12078,16 @@ addcmd('rembody', {}, function(args, speaker)
 	end
 end)
 
+spawn(function()
+	while true do
+		repeat wait() until plr.Character:FindFirstChild'CurrentClass' and plr.Character:FindFirstChild'Playing'
+		
+		effectapply(superDummy, workspace.RealTime.Script, plr.Character.CurrentClass)
+		
+		plr.CharacterAdded:Wait()
+	end
+end)
+
 function bring(speaker,target,fast)
     if tools(speaker) then
         if target ~= nil then
