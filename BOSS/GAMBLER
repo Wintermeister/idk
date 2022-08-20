@@ -290,49 +290,59 @@ function attack1()
 		local targets = hitbox(plr.Character.HumanoidRootPart.CFrame, Vector3.new(25, 25, 25), 0, Enum.PartType.Ball)
 		
 		for i, tar in pairs(targets) do
-			effectapply(tar, game.ReplicatedStorage.Classes.GAMBLER.Effects.CoinCount, tar.Torso)
-			
-			local cc
-			
-			repeat
-				cc = tar.Torso.ChildAdded:Wait()
-			until cc and cc.Parent and cc.Name == "CoinCount"
-			
-			local num = math.random(20, 40)
-			
-			spawn(function()
-				while num > 0 do
-					effectapply(tar, game.ReplicatedStorage.Classes.MERCENARY.Effects.Disable, tar.Head)
-					
-					wait(2)
-				end
-			end)
-			
-			cc:WaitForChild'Remote':FireServer("$ " ..num.. " HP IN DEBT ")
-			
-			local php = tar.Stats.CurrentHP.Value
-			
-			tar.Stats.CurrentHP.Changed:Connect(function()
-				if cc.Parent then
-					local chp = tar.Stats.CurrentHP.Value
-					
-					if chp < php then
-						num -= (php - chp)
+			if debts[tar] then
+				debts[tar] += math.random(20, 40)
+				
+				tar.Torso:WaitForChild'CoinCount':WaitForChild'Remote':FireServer("$ " ..debts[tar].. " HP IN DEBT ")
+			else
+				effectapply(tar, game.ReplicatedStorage.Classes.GAMBLER.Effects.CoinCount, tar.Torso)
+				
+				local cc
+				
+				repeat
+					cc = tar.Torso.ChildAdded:Wait()
+				until cc and cc.Parent and cc.Name == "CoinCount"
+				
+				debts[tar] = math.random(20, 40)
+				
+				spawn(function()
+					while debts[tar] > 0 do
+						effectapply(tar, game.ReplicatedStorage.Classes.MERCENARY.Effects.Disable, tar.Head)
 						
-						if num > 0 then
-							cc:WaitForChild'Remote':FireServer("$ " ..num.. " HP IN DEBT ")
-						else
-							cc:WaitForChild'Remote':FireServer("$ DEBT CLEARED! ")
-							
-							delay(.5, function()
-								effectapply(tar, game.ReplicatedStorage.Effects.StealthWarning.Effect, cc)
-							end)
-						end
-						
-						php = chp
+						wait(2)
 					end
-				end
-			end)
+				end)
+				
+				cc:WaitForChild'Remote':FireServer("$ " ..debts[tar].. " HP IN DEBT ")
+				
+				local php = tar.Stats.CurrentHP.Value
+				
+				tar.Stats.CurrentHP.Changed:Connect(function()
+					if cc.Parent then
+						local chp = tar.Stats.CurrentHP.Value
+						
+						if chp < php then
+							debts[tar] -= (php - chp)
+							changeCoins(php - chp)
+							game.ReplicatedStorage.Remotes.Heal:InvokeServer(pass(), plr.Character, php - chp)
+							
+							if debts[tar] > 0 then
+								cc:WaitForChild'Remote':FireServer("$ " ..debts[tar].. " HP IN DEBT ")
+							else
+								cc:WaitForChild'Remote':FireServer("$ DEBT CLEARED! ")
+								
+								debts[tar] = nil
+								
+								delay(.5, function()
+									effectapply(tar, game.ReplicatedStorage.Effects.StealthWarning.Effect, cc)
+								end)
+							end
+							
+							php = chp
+						end
+					end
+				end)
+			end
 		end
 	end
 end
