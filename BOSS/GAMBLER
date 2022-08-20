@@ -1,0 +1,515 @@
+local baseClass = "GAMBLER"
+
+
+
+local plr = game.Players.LocalPlayer
+
+if plr:FindFirstChild("remotesFired") == nil then
+    local v11 = Instance.new("IntValue", plr)
+    v11.Value = 0
+    v11.Name = "remotesFired"
+else
+    v11 = plr:FindFirstChild("remotesFired")
+end
+
+function pass()
+    local v12 = v11.Value + 1
+    v11.Value = v12
+    return "{CS-G10-" .. math.floor((v12 * 7) ^ 2.7) + 25 .. "-AB2g-dAB50NYU}"
+end
+
+function effectapply(p10, p11, p12, p13, p14)
+    coroutine.resume(coroutine.create(function()
+        u14 = pass()
+        local v62 = game.ReplicatedStorage.Remotes.EffectApply:InvokeServer(u14, p10, p11, p12, p13, p14)
+    end))
+end
+
+baseClass = game.ReplicatedStorage.Classes[baseClass]
+
+local sd = workspace.SuperDummy
+local inv = game.Players.LocalPlayer.PlayerData.Inventory
+local token = inv:FindFirstChild'FortuneToken'
+
+if token and not baseClass:FindFirstChild(token.Name) then
+	effectapply(sd, token, baseClass)
+	
+	token = baseClass:WaitForChild(token.Name)
+	
+	local blacklist = {
+		RightArm = true,
+		LeftArm = true
+	}
+	local blacklist2 = {
+		Hat = true,
+		HandleLeft = true,
+		HandleRight = true
+	}
+
+	for i, c in pairs(baseClass.MainSkin:GetChildren()) do
+		if not blacklist[c.Name] and not blacklist2[c.Name] then
+			effectapply(sd, c, token)
+		end
+	end
+	
+	for i, c in pairs(game.ReplicatedStorage.Classes.TRICKSTER.MainSkin:GetChildren()) do
+		if blacklist[c.Name] then
+			effectapply(sd, c, token)
+		end
+	end
+	
+	for i, c in pairs(game.ReplicatedStorage.Classes.MEDIC.Wicked:GetChildren()) do
+		if c.Name == "Hat" then
+			effectapply(sd, c, token)
+		end
+	end
+	
+	for i, c in pairs(game.ReplicatedStorage.Classes.MERCENARY.MainSkin:GetChildren()) do
+		if c.Name == "HandleLeft" then
+			effectapply(sd, c, token)
+		end
+	end
+	
+	for i, c in pairs(game.ReplicatedStorage.Classes.THIEF.MainSkin:GetChildren()) do
+		if c.Name == "HandleRight" then
+			effectapply(sd, c, token)
+		end
+	end
+end
+
+local ui = plr.PlayerGui.ClassGui
+local projRemote = game.ReplicatedStorage.Remotes.Projectile
+local weaponColor = plr.CharacterColors.WeaponColor
+
+game.ReplicatedStorage.Remotes.ChangeSkin:FireServer(pass(), plr.Character.CurrentClass.Value, token.Name)
+
+repeat wait() until plr.PlayerGui.ClassGui ~= ui
+
+ui = plr.PlayerGui.ClassGui
+local main = ui.MainHUD
+
+ui.Main.Disabled = true
+
+function guicolorchange()
+	if main.Parent then
+		main.Abilites.Attack.Icon.ImageColor3 = weaponColor.Value
+		main.Abilites.Ability1.Icon.ImageColor3 = weaponColor.Value
+		main.Abilites.Ability2.Icon.ImageColor3 = weaponColor.Value
+		main.Abilites.Critical.Icon.ImageColor3 = weaponColor.Value
+	end
+end
+
+guicolorchange()
+
+weaponColor.Changed:Connect(guicolorchange)
+
+local hum = plr.Character.Humanoid
+local a0anims = {
+	hum:LoadAnimation(game.ReplicatedStorage.Classes.THIEF.ClassGui.AttackAnim1),
+	hum:LoadAnimation(game.ReplicatedStorage.Classes.HITMAN.ClassGui.AttackAnim2),
+	hum:LoadAnimation(game.ReplicatedStorage.Classes.GAMBLER.ClassGui.AttackAnim1)
+}
+local a3anim = hum:LoadAnimation(game.ReplicatedStorage.Classes.GAMBLER.ClassGui.CriticalAnim)
+
+function changeSpeed(ofs)
+	plr.Character.Humanoid.WalkSpeed = plr.Character.Stats.BaseSpeed.Value + plr.Character.Stats.ChangedSpeed.Value + ofs
+end
+
+local coins = 0
+local debts = {}
+
+local function changeCoins(num)
+	coins += num
+	plr.Character.Torso:WaitForChild'CoinCount'.Remote:FireServer(coins.. " ")
+	main.CoinCount.Text = "Coins: " ..coins
+end
+
+changeCoins(20)
+
+cds = {a0 = 0, a1 = 0, a2 = 0, a3 = 0}
+cdt = {a0 = .5, a1 = 3, a2 = 4, a3 = 5}
+
+function rc()
+	local tab = {plr.Character}
+	
+	local rp = RaycastParams.new()
+	rp.FilterType = Enum.RaycastFilterType.Blacklist
+	rp.FilterDescendantsInstances = tab
+	
+	while not rac do
+		local ray = workspace:Raycast(plr.Character.HumanoidRootPart.Position, CFrame.new(Vector3.new(0,1,0),Vector3.new(0,0,0)).lookVector * 1000, rp)
+		
+		if ray then
+			if not ray.Instance:FindFirstChild'Terrain' or not ray.Instance.CanCollide then
+				table.insert(tab, ray.Instance)
+				rp.FilterDescendantsInstances = tab
+			else
+				return ray
+			end
+		end
+	end
+end
+
+function hitbox(pos, siz, dmg, shape, effect)
+	local hits = {}
+	
+	local hb = Instance.new("Part", workspace)
+	hb.Transparency = 1
+	hb.Anchored = true
+	hb.CanCollide = false
+	hb.CanTouch = true
+	hb.CFrame = pos
+	hb.Size = siz
+	hb.TopSurface = "Smooth"
+	hb.BottomSurface = "Smooth"
+	hb.BrickColor = BrickColor.new("Bright red")
+	hb.Shape = shape or 1
+	hb.Name = "Hitbox"
+	
+	hb.Touched:Connect(function() end)
+	
+	game:GetService'Debris':AddItem(hb, .5)
+	
+	for i, c in pairs(hb:GetTouchingParts()) do
+		c = c.Parent
+		
+		if c and c:FindFirstChild'Humanoid' and c:FindFirstChild'HumanoidRootPart' and c ~= plr.Character and not hits[c] and c.Stats.CurrentHP.Value > 0 and c.Stats.Safe.Value <= 0 then
+			hits[c] = c
+			
+			if dmg > 0 then
+				game.ReplicatedStorage.Remotes.Damage:InvokeServer(pass(), workspace.RealTime.Value, c, dmg)
+				
+				changeCoins(dmg)
+			end
+			
+			effectapply(c, effect, c.Head)
+		end
+	end
+	
+	return hits
+end
+
+function cooldown(var, obj, override)
+	cds[var] = override or cdt[var]
+	obj.Icon.ImageTransparency = .5
+	obj.CooldownDisplay.Text = cds[var]
+	
+	spawn(function()
+		while cds[var] > 0 do
+			task.wait(.1)
+			
+			cds[var] -= .1
+			cds[var] = math.floor(cds[var] * 10 + .5) / 10
+			obj.Icon.ImageTransparency = .5
+			obj.CooldownDisplay.Text = cds[var]
+		end
+		
+		cds[var] = 0
+		obj.Icon.ImageTransparency = 0
+		obj.CooldownDisplay.Text = ""
+	end)
+end
+
+local att0n = 1
+
+function attack0()
+	if cds["a0"] == 0 then
+		cooldown("a0", main.Abilites.Attack)
+		
+		a0anims[att0n]:Play()
+		
+		if att0n == 1 then
+		
+		elseif att0n == 2 then
+			main.Abilites.Attack.Chain.Text = "! ! !"
+			
+			delay(1, function()
+				main.Abilites.Attack.Chain.Text = ""
+				att0n = 1
+			end)
+		else
+			main.Abilites.Attack.Chain.Text = ""
+			
+			local coinc = math.floor(math.sqrt(coins))
+			local mul = 1
+			
+			if math.floor(math.sqrt(coins)) == math.sqrt(coins) then mul *= 2 end
+			if math.floor(coins / 10) == coins / 10 then mul *= 2 end
+			
+			changeCoins(-(coinc^2))
+			
+			if coinc > 0 then
+				for i = 1, coinc do
+					local be = game.ReplicatedStorage.Classes.GAMBLER.Projectile.attack
+					
+					local cf = plr.Character.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(5 * (i - coinc / 2 - .5)), 0) * CFrame.new(0, .5, -2)
+					
+					local b = be:Clone()
+					b.Owner.Value = plr
+					b.Origin.Value = cf.Position
+					b.CFrame = cf
+					b.Color = weaponColor.Value
+					b.Damage.Value *= mul
+					local bph = b.ProjectileHandler
+					bph.Projectile.Value = b
+					bph.Parent = plr.Character
+					
+					b.Parent = workspace
+					
+					projRemote:FireServer(be, cf, weaponColor.Value)
+				end
+			end
+		end
+		
+		att0n += 1
+		
+		if att0n > table.getn(a0anims) then
+			att0n = 1
+		end
+		
+		local function hb2(siz, z, x, y)
+			hitbox(plr.Character.HumanoidRootPart.CFrame * CFrame.new(x, y, -z), Vector3.new(1,1,1) * siz, 2, Enum.PartType.Ball)
+			
+			wait()
+		end
+		
+		hb2(6, 2, 0, 0)
+		hb2(6, 4, 0, 0)
+		hb2(6, 4, 2, 0)
+		hb2(6, 4, -2, 0)
+		hb2(6, 5, 0, 0)
+		hb2(6, 5, 2, 0)
+		hb2(6, 5, -2, 0)
+	end
+end
+
+function attack1()
+	if cds["a1"] == 0 then
+		cooldown("a1", main.Abilites.Ability1)
+		
+		local targets = hitbox(plr.Character.HumanoidRootPart.CFrame, Vector3.new(25, 25, 25), 0, Enum.PartType.Ball)
+		
+		for i, tar in pairs(targets) do
+			effectapply(tar, game.ReplicatedStorage.Classes.GAMBLER.Effects.CoinCount, tar.Torso)
+			
+			local cc
+			
+			repeat
+				cc = tar.Torso.ChildAdded:Wait()
+			until cc and cc.Parent and cc.Name == "CoinCount"
+			
+			local num = math.random(20, 40)
+			
+			spawn(function()
+				while num > 0 do
+					effectapply(tar, game.ReplicatedStorage.Classes.MERCENARY.Effects.Disable, tar.Head)
+					
+					wait(2)
+				end
+			end)
+			
+			cc:WaitForChild'Remote':FireServer("$ " ..num.. " HP IN DEBT ")
+			
+			local php = tar.Stats.CurrentHP.Value
+			
+			tar.Stats.CurrentHP.Changed:Connect(function()
+				if cc.Parent then
+					local chp = tar.Stats.CurrentHP.Value
+					
+					if chp < php then
+						num -= (php - chp)
+						
+						if num > 0 then
+							cc:WaitForChild'Remote':FireServer("$ " ..num.. " HP IN DEBT ")
+						else
+							cc:WaitForChild'Remote':FireServer("$ DEBT CLEARED! ")
+							
+							delay(.5, function()
+								effectapply(tar, game.ReplicatedStorage.Effects.StealthWarning.Effect, cc)
+							end)
+						end
+						
+						php = chp
+					end
+				end
+			end)
+		end
+	end
+end
+
+function attack2()
+	if cds["a2"] == 0 then
+		cooldown("a2", main.Abilites.Ability2)
+		
+		local be = game.ReplicatedStorage.Classes.GAMBLER.Projectile.ability2
+		
+		local cf = plr.Character.HumanoidRootPart.CFrame * CFrame.new(0, .5, -2) * CFrame.Angles(math.rad(15), 0, 0)
+		
+		local b = be:Clone()
+		b.Owner.Value = plr
+		b.Origin.Value = cf.Position
+		b.CFrame = cf
+		b.Color = weaponColor.Value
+		local bph = b.ProjectileHandler
+		bph.Projectile.Value = b
+		bph.Parent = plr.Character
+		
+		b.Parent = workspace
+		
+		projRemote:FireServer(be, cf, weaponColor.Value)
+		
+		local pcf = b.CFrame
+		
+		repeat pcf = b.CFrame game:GetService'RunService'.Heartbeat:Wait() until not b.Parent or b.Transparency == 1
+		
+		for i = 1, 4 do
+			local cf2 = CFrame.new(b.Position) * CFrame.Angles(0, math.rad(90 * i), 0) * CFrame.Angles(math.rad(45), 0, 0)
+			
+			local b = be:Clone()
+			b.Owner.Value = plr
+			b.Origin.Value = cf2.Position
+			b.CFrame = cf2
+			b.Color = weaponColor.Value
+			local bph = b.ProjectileHandler
+			bph.Projectile.Value = b
+			bph.Parent = plr.Character
+			
+			b.Parent = workspace
+			
+			projRemote:FireServer(be, cf2, weaponColor.Value)
+		end
+	end
+end
+
+function attack3()
+	if cds["a3"] == 0 then
+		cooldown("a3", main.Abilites.Critical)
+		
+		a3anim:Play()
+		
+		local be = game.ReplicatedStorage.Classes.GAMBLER.Projectile.critical
+		
+		local cf = plr.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, -2)
+		
+		local b = be:Clone()
+		b.Owner.Value = plr
+		b.Origin.Value = cf.Position
+		b.CFrame = cf
+		b.Color = weaponColor.Value
+		local bph = b.ProjectileHandler
+		bph.Projectile.Value = b
+		bph.Parent = plr.Character
+		
+		b.Parent = workspace
+		
+		projRemote:FireServer(be, cf, weaponColor.Value)
+		
+		wait(1)
+		
+		local targets = hitbox(b.CFrame, Vector3.new(22, 22, 22), 0, Enum.PartType.Ball)
+		
+		if targets then
+			for i, tar in pairs(targets) do
+				spawn(function()
+					effectapply(tar, "Knockup", tar.Head, b.CFrame * CFrame.Angles(math.rad(90), 0, 0), 50)
+					effectapply(tar, game.ReplicatedStorage.Classes.DUELIST.Effects.Stun, tar.Head)
+					
+					effectapply(tar, game.ReplicatedStorage.Classes.GAMBLER.Effects.CoinCount, tar.Torso)
+					
+					local cc
+					
+					repeat
+						cc = tar.Torso.ChildAdded:Wait()
+					until cc and cc.Parent and cc.Name == "CoinCount"
+					
+					local num = 0
+					
+					for i = 1, 20 do
+						num = math.random(0, 50)
+						cc:WaitForChild'Remote':FireServer("$ " ..num.. "... ")
+						
+						wait(.05)
+					end
+					
+					cc.Remote:FireServer("$ " ..num.. "! ")
+					
+					if num < 10 then
+						effectapply(tar, game.ReplicatedStorage.Classes.MEDIC.Effects.SuperRegenerate, tar.Head)
+					elseif num > 40 then
+						for i = 1, 5 do
+							effectapply(tar, game.ReplicatedStorage.Classes.TRICKSTER.Effects.Bleed, tar.Head)
+						end
+					elseif num == 25 then
+						num = 100
+					end
+					
+					changeCoins(num)
+					
+					game.ReplicatedStorage.Remotes.Damage:InvokeServer(pass(), workspace.RealTime.Value, tar, num)
+					
+					wait(.5)
+					
+					effectapply(sd, game.ReplicatedStorage.Effects.StealthWarning.Effect, cc)
+				end)
+			end
+		end
+	end
+end
+
+function reqs(funct)
+	if plr.Character.Stats.Disable.Value ~= 0 then return end
+	if plr.Character.Stats.CurrentHP.Value <= 0 then return end
+	if not plr.PlayerGui:FindFirstChild'ClassGui' then return end
+	if plr.PlayerGui.ClassGui ~= ui then return end
+	
+	funct()
+end
+
+game.Players.LocalPlayer:GetMouse().Button1Down:Connect(function()
+	reqs(attack0)
+end)
+
+game:GetService'UserInputService'.InputBegan:Connect(function(key, typ)
+	if typ then return end
+	
+	if key.KeyCode == Enum.KeyCode.Q then
+		reqs(attack1)
+	end
+	if key.KeyCode == Enum.KeyCode.E then
+		reqs(attack2)
+	end
+	if key.KeyCode == Enum.KeyCode.F then
+		reqs(attack3)
+	end
+end)
+
+main:WaitForChild'Abilites':WaitForChild'Attack'.MouseButton1Click:Connect(function() reqs(attack0) end)
+main:WaitForChild'Abilites':WaitForChild'Ability1'.MouseButton1Click:Connect(function() reqs(attack1) end)
+main:WaitForChild'Abilites':WaitForChild'Ability2'.MouseButton1Click:Connect(function() reqs(attack2) end)
+main:WaitForChild'Abilites':WaitForChild'Critical'.MouseButton1Click:Connect(function() reqs(attack3) end)
+
+repeat wait() until plr.Character:FindFirstChild'Extra'
+
+local originalInfo = {}
+local newInfo = {
+	CName = "CLASS NAME",
+	Attack = "Move0Name - NIL",
+	Ability1 = "Move1Name - NIL",
+	Ability2 = "Move2Name - NIL",
+	Critical = "Move3Name - NIL",
+	Credit = "CLASS DESCRIPTION"
+}
+
+for i, c in pairs(baseClass.ClassInfo:GetChildren()) do
+	originalInfo[c] = c.Value
+	
+	if newInfo[c.Name] then
+		c.Value = newInfo[c.Name]
+	end
+end
+
+repeat game:GetService'RunService'.Heartbeat:Wait() until not ui.Parent
+
+for i, c in pairs(originalInfo) do
+	i.Value = c
+end
