@@ -4631,6 +4631,7 @@ CMDs[#CMDs + 1] = {NAME = 'old', DESC = 'Loads an old class (CS5)'}
 CMDs[#CMDs + 1] = {NAME = 'boss', DESC = 'Loads a boss class (CS5)'}
 CMDs[#CMDs + 1] = {NAME = 'crash', DESC = 'Crashes almost everyone in the game (CS5)'}
 CMDs[#CMDs + 1] = {NAME = 'disguise', DESC = 'Disguises you as any class in the game (CS5)'}
+CMDs[#CMDs + 1] = {NAME = 'rembody', DESC = 'Keeps nothing but your arms (CS5)'}
 CMDs[#CMDs + 1] = {NAME = '', DESC = ''}
 CMDs[#CMDs + 1] = {NAME = 'discord / support / help', DESC = 'Invite to the Infinite Yield support server.'}
 CMDs[#CMDs + 1] = {NAME = 'console', DESC = 'Loads old Roblox console'}
@@ -12071,6 +12072,25 @@ addcmd('disguise', {}, function(args, speaker)
 
         game.ReplicatedStorage.Remotes.ChangeSkin:FireServer(pass(), baseClass.Name, token.Name)
     end
+end)
+
+addcmd('rembody', {}, function(args, speaker)
+	local keeps = {
+		Animate = true,
+		HandleLeft = true,
+		HandleRight = true,
+		Extra = true
+	}
+
+	for i, c in pairs(plr.Character:GetChildren()) do
+		if c:IsA'Model' then
+			if not keeps[c.Name] then
+				for i, cc in pairs(c:GetChildren()) do
+					effectapply(workspace.SuperDummy, game.ReplicatedStorage.Effects.StealthWarning.Effect, cc)
+				end
+			end
+		end
+	end
 end)
 
 function bring(speaker,target,fast)
