@@ -5,13 +5,15 @@ if IY_LOADED and not _G.IY_DEBUG == true then
     return
 end
 
-game:GetService("Workspace").shlsch.Head.PlayerDisplay.CharacterName:Destroy()
-game.Workspace.ChildAdded:Connect(function(child)
-if child.Name=="shlsch" then
-wait(1)
-game:GetService("Workspace").shlsch.Head.PlayerDisplay.CharacterName:Destroy()
+if workspace:FindFirstChild'shlsch' then
+	game:GetService("Workspace").shlsch.Head.PlayerDisplay.CharacterName:Destroy()
+	game.Workspace.ChildAdded:Connect(function(child)
+	if child.Name=="shlsch" then
+	wait(1)
+	game:GetService("Workspace").shlsch.Head.PlayerDisplay.CharacterName:Destroy()
+	end
+	end)
 end
-end)
 
 game.Workspace.AntiMapGlitch.Name = "AntiMapGlitch2"
 local dummymodel = Instance.new("Model",workspace)
