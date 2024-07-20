@@ -1,5 +1,3 @@
---i found the bodies, schwaffledan
-
 if IY_LOADED and not _G.IY_DEBUG == true then
     error("Infinite Yield is already running!",0)
     return
@@ -8,7 +6,7 @@ end
 --[[if workspace:FindFirstChild'shlsch' then
 	game:GetService("Workspace").shlsch.Head.PlayerDisplay.CharacterName:Destroy()
 	game.Workspace.ChildAdded:Connect(function(child)
-	if child.Name=="shlsch" then
+	if child.Name=="wdnter" then
 	wait(1)
 	game:GetService("Workspace").shlsch.Head.PlayerDisplay.CharacterName:Destroy()
 	end
